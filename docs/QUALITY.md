@@ -8,7 +8,13 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 - [ ] Tasks and habits scheduled today appear in Unassigned until placed.
 - [ ] Drag an item into a block. Verify it disappears from Unassigned and can be moved back.
 - [ ] Use Plan instead of dragging, especially on a phone.
-- [ ] Reorder several tasks and habits together in one block with drag or Up / Down.
+- [ ] Reorder several tasks and habits together in one block with drag or **More → Move up / Move down**.
+- [ ] Each planned session is visually distinct, with enough contrast in light and dark modes.
+- [ ] Each card has a tidy primary area and **More** for additional commands, without clipped controls or visual overflow.
+- [ ] Select a preset background, then a custom hex color; both should apply to just that session.
+- [ ] Move a colored session between blocks, reorder it, and reopen the app. The chosen color stays with that session.
+- [ ] Reset a session to automatic color. Changing the color of one linked session must not recolor its other appearances.
+- [ ] Verify the Unassigned list remains next to the timeline on desktop, so drag-and-drop stays convenient.
 - [ ] Add a second session for one task. Its linked cards should appear in both blocks, but it should count as one item.
 - [ ] Move just one linked session to another block without moving the other sessions.
 - [ ] Set exact times within a block; try an invalid time and check the explanation.
