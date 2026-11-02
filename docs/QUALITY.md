@@ -28,6 +28,8 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 
 - [ ] Completing a task in one block updates its other sessions.
 - [ ] A repeated habit counts as completed once, even when planned several times.
+- [ ] Expand a task with subtasks and complete one. Its status updates in every linked session.
+- [ ] When planning tomorrow, task and habit completion controls are disabled; only the plan can be changed.
 - [ ] No duplicate native task or habit is created.
 - [ ] Both Today+ and Day Blocks can be installed together without changing each other's settings.
 
