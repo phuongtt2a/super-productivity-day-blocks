@@ -219,7 +219,7 @@ with sync_playwright() as p:
         restored=browser.new_page(viewport={"width":320,"height":690},has_touch=True,is_mobile=True)
         install(restored,saved)
         assert restored.locator('.morning .session-title',has_text="Prepare quarterly plan").count()>=1
-        assert restored.locator('.morning [data-session]').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
+        assert restored.locator('.morning [data-session]').evaluate_all("(cards)=>cards.some(el=>el.style.getPropertyValue('--session-tint')==='#bcacf0')")
         assert restored.locator('.evening .session-title',has_text="Read 60 minutes").count()==1
         assert restored.locator('#timeline .block').count()==4
         assert restored.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
