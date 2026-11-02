@@ -134,6 +134,15 @@ with sync_playwright() as p:
         page.locator('#session-cancel').click()
         print("invalid block time rejected: PASS")
 
+        # A flexible 3-hour session cannot fit in the 2-hour Night block.
+        page.locator('.night [data-edit-session]').click()
+        page.locator('#exact-time').uncheck()
+        page.locator('#session-duration').fill("180")
+        page.locator('#session-save').click()
+        assert "must fit Night" in page.locator('#session-error').inner_text()
+        page.locator('#session-cancel').click()
+        print("flexible duration respects block capacity: PASS")
+
         # Repeat a habit on future scheduled days.
         page.locator('[data-plan-key="habit:water"]').click()
         page.locator('#session-block').select_option("morning")
@@ -211,6 +220,31 @@ with sync_playwright() as p:
         assert page.locator('.afternoon .session-title',has_text="Review design").count()==1
         assert page.locator('#unassigned [data-source-key="task:review"]').count()==0
         print("pointer drag from source into Afternoon: PASS")
+
+        # Move that single session by drag (no duplicate), then unassign it.
+        row=page.locator('.afternoon .session',has=page.locator('.session-title',has_text="Review design"))
+        row.locator('[data-drag-session]').scroll_into_view_if_needed()
+        handle=row.locator('[data-drag-session]').bounding_box()
+        dest=page.locator('.evening .block-list').bounding_box()
+        page.mouse.move(handle['x']+handle['width']/2,handle['y']+handle['height']/2)
+        page.mouse.down()
+        page.mouse.move(dest['x']+dest['width']/2,dest['y']+100,steps=14)
+        page.mouse.up()
+        assert page.locator('.evening .session-title',has_text="Review design").count()==1
+        assert page.locator('.afternoon .session-title',has_text="Review design").count()==0
+        assert page.locator('#unassigned [data-source-key="task:review"]').count()==0
+
+        row=page.locator('.evening .session',has=page.locator('.session-title',has_text="Review design"))
+        row.locator('[data-drag-session]').scroll_into_view_if_needed()
+        handle=row.locator('[data-drag-session]').bounding_box()
+        dest=page.locator('#backlog').bounding_box()
+        page.mouse.move(handle['x']+handle['width']/2,handle['y']+handle['height']/2)
+        page.mouse.down()
+        page.mouse.move(dest['x']+dest['width']/2,dest['y']+90,steps=14)
+        page.mouse.up()
+        assert page.locator('.evening .session-title',has_text="Review design").count()==0
+        assert page.locator('#unassigned [data-source-key="task:review"]').count()==1
+        print("cross-block pointer move and drag back to Unassigned: PASS")
 
         # Native completion is shared across all planned sessions.
         page.locator('.afternoon [data-task-done="plan"]').click()
