@@ -134,6 +134,7 @@ with sync_playwright() as p:
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
         assert page.locator('#more-backdrop:not(.hidden)').count()==1
         print("palette, arbitrary hex selection and menu persistence: PASS")
+        page.locator('#more-close').click()
 
         # Additional linked Afternoon session shares the same native ID.
         page.locator('.morning [data-copy-session]').click()
