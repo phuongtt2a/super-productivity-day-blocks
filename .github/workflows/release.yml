@@ -28,15 +28,14 @@ jobs:
         run: |
           VERSION="$(python -c 'import json; print(json.load(open("plugin/manifest.json"))["version"])')"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
-          # Only stable versions are published when merging to main.
-          # Preview builds remain downloadable from the check workflow.
+          # Beta versions are published as GitHub pre-releases; stable versions
+          # appear as the latest release once the user has accepted them.
           if [[ "$VERSION" == *-* ]]; then
-            echo "stable=false" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
           else
-            echo "stable=true" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Validate and package
-        if: steps.version.outputs.stable == 'true'
         env:
           TAG: ${{ steps.version.outputs.tag }}
         run: |
@@ -44,7 +43,6 @@ jobs:
           node --check plugin/plugin.js
           python scripts/package.py --tag "$TAG"
       - name: Build release notes
-        if: steps.version.outputs.stable == 'true'
         env:
           TAG: ${{ steps.version.outputs.tag }}
         run: |
@@ -62,19 +60,24 @@ jobs:
           Path("dist/release-notes.md").write_text("\n".join(section).strip()+"\n" if section else "Day Blocks "+version+"\n",encoding="utf-8")
           PY
       - name: Publish tested installation archive
-        if: steps.version.outputs.stable == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.version.outputs.tag }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
         run: |
           set -euo pipefail
           ASSET="dist/day-blocks-super-productivity.zip"
+          if [[ "$PRERELEASE" == "true" ]]; then
+            release_type=(--prerelease)
+          else
+            release_type=(--latest)
+          fi
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$ASSET" --clobber --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$TAG" "$ASSET" \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title "Day Blocks $TAG" --latest \
+              --title "Day Blocks $TAG" "${release_type[@]}" \
               --notes-file dist/release-notes.md
           fi
           mkdir -p dist/verify
