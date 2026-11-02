@@ -48,7 +48,7 @@ The four time blocks **remain in one horizontal row**, just like a timeline. Swi
 
 ## Install the preview
 
-**Status: v0.1.0 preview — not a stable release yet.**
+**Status: v0.1.1-beta.1 preview — not a stable release yet.**
 
 1. Open the [Day Blocks repository](https://github.com/phuongtt2a/super-productivity-day-blocks) and find the latest successful **Check Day Blocks plugin** run for the preview pull request.
 2. Download the `day-blocks-preview` artifact and extract it.
