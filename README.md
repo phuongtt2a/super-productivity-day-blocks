@@ -24,7 +24,7 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 ## Make space for what matters
 
 - **Four blocks, one day.** Follow Morning (5 AM–noon), Afternoon (noon–6 PM), Evening (6–10 PM), and Night (10 PM–midnight) from left to right.
-- **Tasks and habits together.** Find today's items in **Unassigned**. Move them into a block with a drag or the **Plan** button.
+- **Tasks and habits together.** Find today's items in **Unassigned**. Move them into a block with a drag or the **Plan** button. Expand a planned task to see and complete its subtasks.
 - **Choose your order.** Drag planned sessions to another position, or use the Up and Down controls.
 - **Plan the time you need.** Leave a session flexible, give it a planned duration, or choose an exact start and end time within its block.
 - **Continue in another block.** Use **+ Session** when one task or habit needs more than one part of the day. The linked cards still represent the same original item.
@@ -54,7 +54,7 @@ When we've finished testing together, the stable version will be available from 
 
 ## A few things to know
 
-Day Blocks plans your time; it is **not a second timer or calendar**. Planning 45 minutes does not log 45 minutes of completed work. A habit's daily goal and actual progress still belong to Super Productivity.
+Day Blocks plans your time; it is **not a second timer or calendar**. Planning 45 minutes does not log 45 minutes of completed work. A habit's daily goal and actual progress still belong to Super Productivity. Actual progress controls are enabled when viewing Today; planning past or future days doesn't secretly change today's habit values.
 
 A task appearing in Morning and Afternoon is **one task with two planned sessions**. Finishing it updates both cards. Tasks and habits you've deleted in Super Productivity can be removed from the plan.
 
