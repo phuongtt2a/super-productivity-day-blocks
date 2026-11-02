@@ -27,11 +27,11 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 
 ## Make space for what matters
 
-- **Four blocks, one day.** Follow Morning (5 AM–noon), Afternoon (noon–6 PM), Evening (6–10 PM), and Night (10 PM–midnight) from left to right.
+- **Four blocks, one day.** Follow Morning (5 AM–noon), Afternoon (noon–6 PM), Evening (6–10 PM), and the slate-gray Night (10 PM–midnight) from left to right.
 - **Tasks and habits together.** Find today's items in **Unassigned**. Move them into a block with a drag or the **Plan** button. Expand a planned task to see and complete its subtasks.
-- **Clear session cards.** Your everyday action stays visible. Open **More** for another session, moving a card up or down, removing it, or choosing its color.
+- **Clean, one-line controls.** Five compact icons for Done (or habit progress), Move up, Move down, Time / Move, and More. Hover or focus to see what each icon does. **More** opens a separate popup for another session, removing a session, and choosing colors.
 - **Make colors yours.** Each session has a soft background by default. Pick a preset or set any custom color; the choice is saved for that individual session.
-- **Choose your order.** Drag planned sessions to another position, or use **More → Move up / Move down**.
+- **Choose your order.** Drag planned sessions to another position, or use the visible up/down arrows on each card.
 - **Plan the time you need.** Leave a session flexible, give it a planned duration, or choose an exact start and end time within its block.
 - **Continue in another block.** Use **+ Session** when one task or habit needs more than one part of the day. The linked cards still represent the same original item.
 - **Keep a daily habit routine.** Choose **Repeat this habit session on future scheduled days** when planning a habit you want to do regularly.
@@ -42,13 +42,13 @@ An item disappears from **Unassigned** after you plan its first session. You can
 
 ## On your phone
 
-The four time blocks **remain in one horizontal row**, just like a timeline. Swipe sideways to move through the day. **Plan**, **Time / Move**, and Up/Down actions work without dragging.
+The four time blocks **remain in one horizontal row**, just like a timeline. Swipe sideways to move through the day. **Plan**, the clock icon, and up/down arrows work without dragging.
 
 ![Compact Day Blocks layout on a small phone](docs/screenshots/day-blocks-small-phone.webp)
 
 ## Install the preview
 
-**Status: v0.1.1-beta.1 preview — not a stable release yet.**
+**Status: v0.1.1-beta.2 preview — not a stable release yet.**
 
 1. Open the [Day Blocks repository](https://github.com/phuongtt2a/super-productivity-day-blocks) and find the latest successful **Check Day Blocks plugin** run for the preview pull request.
 2. Download the `day-blocks-preview` artifact and extract it.
@@ -63,6 +63,8 @@ When we've finished testing together, the stable version will be available from 
 Day Blocks plans your time; it is **not a second timer or calendar**. Planning 45 minutes does not log 45 minutes of completed work. A habit's daily goal and actual progress still belong to Super Productivity. Actual progress controls are enabled when viewing Today; planning past or future days doesn't secretly change today's habit values.
 
 A task appearing in Morning and Afternoon is **one task with two planned sessions**. Finishing it updates both cards. Tasks and habits you've deleted in Super Productivity can be removed from the plan.
+
+Routine planning actions quietly update the board. If something fails, Day Blocks briefly shows an explanation rather than leaving a permanent notification at the bottom.
 
 You can keep using Today+ v2.0.0 exactly as before. Day Blocks doesn't modify its layout, preferences, or plugin release.
 
