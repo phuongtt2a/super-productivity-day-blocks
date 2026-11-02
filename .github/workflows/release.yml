@@ -1,0 +1,74 @@
+name: Publish Day Blocks release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: day-blocks-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Get version
+        id: version
+        run: |
+          VERSION="$(python -c 'import json; print(json.load(open("plugin/manifest.json"))["version"])')"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Validate and package
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          python -m unittest discover -s tests -p 'test_*.py' -v
+          node --check plugin/plugin.js
+          python scripts/package.py --tag "$TAG"
+      - name: Build release notes
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          version=os.environ["TAG"].removeprefix("v")
+          lines=Path("CHANGELOG.md").read_text(encoding="utf-8").splitlines()
+          start=next((i for i,line in enumerate(lines) if line.startswith("## "+version)),None)
+          section=[]
+          if start is not None:
+              for line in lines[start:]:
+                  if section and line.startswith("## "):break
+                  section.append(line)
+          Path("dist/release-notes.md").write_text("\n".join(section).strip()+"\n" if section else "Day Blocks "+version+"\n",encoding="utf-8")
+          PY
+      - name: Publish tested installation archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          ASSET="dist/day-blocks-super-productivity.zip"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ASSET" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "$ASSET" \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "Day Blocks $TAG" --latest \
+              --notes-file dist/release-notes.md
+          fi
+          mkdir -p dist/verify
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'day-blocks-super-productivity.zip' --dir dist/verify
+          cmp "$ASSET" "dist/verify/day-blocks-super-productivity.zip"
+          echo "Verified public release asset byte-for-byte."
