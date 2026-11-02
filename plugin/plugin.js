@@ -1,11 +1,6 @@
-// Day Blocks: show the independent time-blocking view inside Super Productivity.
-// Task and habit changes are made only through the documented PluginAPI.
+// Day Blocks is an iframe plugin. Super Productivity automatically adds the
+// plugin's menu entry from manifest.json, so no duplicate menu button is needed.
+// All task and habit interactions use the documented PluginAPI from index.html.
 (function () {
   'use strict';
-  if (typeof PluginAPI === 'undefined') return;
-  PluginAPI.registerMenuEntry({
-    label: 'Day Blocks',
-    icon: 'view_week',
-    onClick: function () { PluginAPI.showIndexHtmlAsView(); }
-  });
 })();
