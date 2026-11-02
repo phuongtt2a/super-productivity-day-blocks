@@ -59,7 +59,7 @@ def install(page,saved=None):
         "__TODAY__",json.dumps(TODAY)).replace("__SAVED__",json.dumps(saved or {}))
     page.evaluate(code)
     page.set_content(HTML)
-    page.wait_for_selector('#unassigned [data-source-key="task:plan"]')
+    page.wait_for_selector('#timeline .block')
 
 def session_card(page,task_id):
     return page.locator('#timeline .session').filter(has=page.locator('.session-title',has_text=task_id))
