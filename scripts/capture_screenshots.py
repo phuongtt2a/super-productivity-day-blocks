@@ -29,6 +29,8 @@ with sync_playwright() as p:
         first=page.locator('.morning .session').first
         first.locator('[data-more-session]').click()
         assert page.locator('#more-popup[role="dialog"]').is_visible()
+        # Full-screen reference makes its centered position visible.
+        save_image(page,"day-blocks-centered-popup.webp",full_page=False)
         page.locator('#more-popup').screenshot(path=str(OUT/"session-color-options.png"),animations="disabled")
         Image.open(OUT/"session-color-options.png").convert("RGB").save(
             OUT/"session-color-options.webp",format="WEBP",quality=88,method=6
