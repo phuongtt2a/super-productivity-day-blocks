@@ -12,7 +12,9 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 
 **Simple controls, distinct sessions**
 
-![Session actions and personalized background-color choices](docs/screenshots/session-color-options.webp)
+![Centered background-color popup over the Day Blocks timeline](docs/screenshots/day-blocks-centered-popup.webp)
+
+![Personalized background-color choices](docs/screenshots/session-color-options.webp)
 
 <details>
 <summary>See the phone layout and a task continuing into another block</summary>
@@ -29,7 +31,7 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 
 - **Four blocks, one day.** Follow Morning (5 AM–noon), Afternoon (noon–6 PM), Evening (6–10 PM), and the slate-gray Night (10 PM–midnight) from left to right.
 - **Tasks and habits together.** Find today's items in **Unassigned**. Move them into a block with a drag or the **Plan** button. Expand a planned task to see and complete its subtasks.
-- **Clean, one-line controls.** Five compact icons for Done (or habit progress), Move up, Move down, Time / Move, and More. Hover or focus to see what each icon does. **More** opens a separate popup for another session, removing a session, and choosing colors.
+- **Clear, one-line controls.** Five compact icons for Done (or habit progress), Move up, Move down, Time / Move, and More. Beneath them, two balanced buttons let you **Add session** or **Remove** a planned session quickly. **More** opens a centered popup just for personalizing its color.
 - **Make colors yours.** Each session has a soft background by default. Pick a preset or set any custom color; the choice is saved for that individual session.
 - **Choose your order.** Drag planned sessions to another position, or use the visible up/down arrows on each card.
 - **Plan the time you need.** Leave a session flexible, give it a planned duration, or choose an exact start and end time within its block.
@@ -48,7 +50,7 @@ The four time blocks **remain in one horizontal row**, just like a timeline. Swi
 
 ## Install the preview
 
-**Status: v0.1.1-beta.2 preview — not a stable release yet.**
+**Status: v0.1.1-beta.3 preview — not a stable release yet.**
 
 1. Open the [Day Blocks repository](https://github.com/phuongtt2a/super-productivity-day-blocks) and find the latest successful **Check Day Blocks plugin** run for the preview pull request.
 2. Download the `day-blocks-preview` artifact and extract it.
@@ -64,7 +66,7 @@ Day Blocks plans your time; it is **not a second timer or calendar**. Planning 4
 
 A task appearing in Morning and Afternoon is **one task with two planned sessions**. Finishing it updates both cards. Tasks and habits you've deleted in Super Productivity can be removed from the plan.
 
-Routine planning actions quietly update the board. If something fails, Day Blocks briefly shows an explanation rather than leaving a permanent notification at the bottom.
+Routine planning actions quietly update the board. If something fails, Day Blocks briefly shows an explanation rather than leaving a permanent notification at the bottom. The color popup stays open during automatic task updates until you close it.
 
 You can keep using Today+ v2.0.0 exactly as before. Day Blocks doesn't modify its layout, preferences, or plugin release.
 
