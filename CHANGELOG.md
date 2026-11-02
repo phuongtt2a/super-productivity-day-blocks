@@ -1,5 +1,12 @@
 # Release notes
 
+## 0.1.1-beta.3 — Centered color popup and faster session actions
+
+- Open the session More menu as a centered popup, rather than beside a card.
+- Place **Add session** and **Remove** side by side on each card, directly under the five-icon toolbar. The popup now focuses on choosing a background color.
+- Keep the popup open while the board refreshes automatically; stop dismissing it simply because task or habit data updates.
+- Keep the original timeline, drag actions, existing session colors and slate-gray Night styling.
+
 ## 0.1.1-beta.2 — One-line controls and a quiet daily timeline
 
 - Display five icon-only session actions on one row: Done or habit progress, Up, Down, Time / Move, and More, with accessible labels and tooltips.
