@@ -78,7 +78,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .block-list{padding:11px 9px;display:grid;align-content:start;gap:9px;flex:1;min-height:170px}
 .block.drop-active,.backlog.drop-active{outline:3px dashed var(--accent);outline-offset:-6px}
 .block.add-more{border-color:var(--accent)}
-.session{background:var(--surface-strong);border:1.5px solid var(--line);border-radius:7px;padding:8px 8px 9px;min-width:0}
+.session{background:color-mix(in srgb,var(--session-tint,#b3d5bd) 34%,var(--surface-strong));border:1.5px solid color-mix(in srgb,var(--session-tint,#b3d5bd) 60%,var(--line));box-shadow:inset 4px 0 0 color-mix(in srgb,var(--session-tint,#b3d5bd) 82%,var(--accent));border-radius:7px;padding:9px 9px 10px;min-width:0}
+.session:hover{border-color:color-mix(in srgb,var(--session-tint,#b3d5bd) 65%,var(--stroke))}
 .session.drop-before{border-top:4px solid var(--accent)}
 .session.drop-after{border-bottom:4px solid var(--accent)}
 .session.is-done{opacity:.75}
@@ -87,7 +88,31 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .session-meta{font-size:10.5px;color:var(--muted);margin:5px 0 6px;line-height:1.35}
 .session.multi{border-left:4px solid var(--accent);padding-left:5px}
 .linked{display:inline-block;border:1px solid var(--accent);padding:3px 5px;border-radius:4px;margin-top:5px;color:var(--ink);font-size:10px;font-weight:800;background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
-.session-controls{display:flex;gap:4px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:7px}
+.session-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;align-items:start;border-top:1px dashed var(--line);margin-top:9px;padding-top:8px}
+.session-footer>.tiny-btn,.session-more>summary{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:37px;padding:7px 6px;font-size:11px;font-weight:800;text-align:center}
+.session-footer>.tiny-btn{background:var(--surface-strong)}
+.session-more{position:relative;min-width:0}
+.session-more>summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:var(--surface-strong);border-radius:5px;user-select:none}
+.session-more>summary::-webkit-details-marker{display:none}
+.session-more>summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.session-more[open]{grid-column:1/-1;grid-row:auto}
+.session-more[open]>summary{max-width:100%;border-color:var(--accent)}
+.session-more-panel{padding:10px;margin-top:7px;background:var(--surface-strong);border:1px solid var(--line);border-radius:5px;display:grid;gap:9px}
+.session-menu-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.session-menu-actions>.tiny-btn{min-height:36px;font-size:11px;white-space:normal;overflow-wrap:anywhere}
+.session-menu-actions>.span-two{grid-column:1/-1}
+.session-menu-actions .remove-session{border-color:color-mix(in srgb,#cf654c 52%,var(--line))}
+.menu-heading{font-size:10px;font-weight:850;letter-spacing:.045em;text-transform:uppercase;color:var(--muted)}
+.session-colors{display:flex;gap:5px;flex-wrap:wrap}
+.color-swatch{display:grid;place-items:center;width:34px;height:34px;min-height:34px;border-radius:5px;background:var(--surface);border:1px solid var(--line);padding:4px}
+.color-swatch .color-dot{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--swatch);border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);font-size:11px;color:#21382e}
+.color-swatch.auto .color-dot{background:conic-gradient(#e8bd71 0 25%,#9ccfae 25% 50%,#a7bde6 50% 75%,#d5b3e0 75% 100%)}
+.color-swatch[aria-pressed=true]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px}
+.custom-color{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:750}
+.custom-color input{width:42px;height:36px;min-height:36px;padding:2px;border:1px solid var(--line);background:var(--surface);border-radius:5px;cursor:pointer}
+.session .action-row{margin-top:8px;gap:6px}
+.session .action-row .tiny-btn{font-size:11px;font-weight:850;background:var(--surface-strong);min-height:35px}
+
 .tiny-btn{font-size:10px;min-height:32px;border-width:1px;box-shadow:none;padding:4px 6px}
 .tiny-btn.icon-only{min-width:30px}
 .subtask-panel{margin-top:8px;padding-top:7px;border-top:1px dotted var(--line)}
@@ -221,6 +246,39 @@ const BLOCKS=[
  {id:'evening',name:'Evening',from:1080,to:1320,label:'6:00 PM – 10:00 PM',icon:'☾'},
  {id:'night',name:'Night',from:1320,to:1440,label:'10:00 PM – midnight',icon:'✦'}
 ];
+const SESSION_PALETTE=[
+ {id:'honey',label:'Honey',hex:'#efcc81'},
+ {id:'mint',label:'Mint',hex:'#9ed8b4'},
+ {id:'sky',label:'Sky',hex:'#a5caf1'},
+ {id:'lilac',label:'Lilac',hex:'#c8b2e9'},
+ {id:'peach',label:'Peach',hex:'#eeb99b'},
+ {id:'rose',label:'Rose',hex:'#e4afc1'},
+ {id:'sage',label:'Sage',hex:'#baccac'},
+ {id:'lemon',label:'Lemon',hex:'#e8e39b'}
+];
+const normalizeColor=value=>{
+ if(typeof value!=='string')return null;
+ if(/^#[0-9a-f]{6}$/i.test(value))return value.toLowerCase();
+ return SESSION_PALETTE.some(c=>c.id===value)?value:null;
+};
+function autoColor(s){
+ let code=0;for(const ch of s.id)code=(code*37+ch.charCodeAt(0))>>>0;
+ return SESSION_PALETTE[code%SESSION_PALETTE.length].hex;
+}
+function resolvedColor(s){
+ const value=normalizeColor(s.color);
+ if(!value)return autoColor(s);
+ if(value[0]==='#')return value;
+ return SESSION_PALETTE.find(c=>c.id===value).hex;
+}
+function colorChoices(s){
+ const value=normalizeColor(s.color);
+ const auto='<button class="color-swatch auto" type="button" data-session-color="'+escapeHTML(s.id)+'" data-color-value="auto" aria-label="Automatic background color" aria-pressed="'+String(!value)+'" title="Automatic color"><span class="color-dot" aria-hidden="true">'+(!value?'✓':'')+'</span></button>';
+ const palette=SESSION_PALETTE.map(c=>'<button class="color-swatch" type="button" data-session-color="'+escapeHTML(s.id)+'" data-color-value="'+c.id+'" aria-label="'+c.label+' background" aria-pressed="'+String(c.id===value)+'" title="'+c.label+'"><span class="color-dot" aria-hidden="true" style="--swatch:'+c.hex+'">'+(c.id===value?'✓':'')+'</span></button>').join('');
+ const custom=value&&value[0]==='#'?value:resolvedColor(s);
+ return '<div class="menu-heading">Background color</div><div class="session-colors" role="group" aria-label="Choose session background color">'+auto+palette+'</div>'+
+ '<label class="custom-color">Custom color <input type="color" data-custom-session-color="'+escapeHTML(s.id)+'" value="'+custom+'" aria-label="Choose a custom background color"></label>';
+}
 const STORAGE='day-blocks.plans.v1';
 const state={api:null,tasks:[],habits:[],projects:new Map(),day:'',today:'',data:{version:1,days:{},routines:[]},revision:0,writeQueue:Promise.resolve(),saving:false,showOverdue:false,showFinished:false,drag:null,editor:null,logHabit:null,demo:false,pendingSync:false,busy:new Set()};
 const BLOCK_MAP=new Map(BLOCKS.map(b=>[b.id,b]));
@@ -244,11 +302,11 @@ function normalizeData(input){
  if(v.days&&typeof v.days==='object'){
   for(const [day,record] of Object.entries(v.days).slice(-120)){
    if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!record||typeof record!=='object')continue;
-   days[day]={sessions:Array.isArray(record.sessions)?record.sessions.filter(validSession).slice(0,600).map(s=>({...s,repeatId:safeId(s.repeatId)?s.repeatId:null,minutes:Number.isFinite(s.minutes)?s.minutes:null})):[],
+   days[day]={sessions:Array.isArray(record.sessions)?record.sessions.filter(validSession).slice(0,600).map(s=>({...s,color:normalizeColor(s.color),repeatId:safeId(s.repeatId)?s.repeatId:null,minutes:Number.isFinite(s.minutes)?s.minutes:null})):[],
      skipped:Array.isArray(record.skipped)?record.skipped.filter(safeId).slice(0,400):[]};
   }
  }
- const routines=Array.isArray(v.routines)?v.routines.filter(s=>validSession(s)&&s.kind==='habit').slice(0,300):[];
+ const routines=Array.isArray(v.routines)?v.routines.filter(s=>validSession(s)&&s.kind==='habit').slice(0,300).map(s=>({...s,color:normalizeColor(s.color)})):[];
  return {version:1,days,routines};
 }
 function record(day=state.day){
@@ -348,8 +406,18 @@ function moveSession(id,block,targetId=null,after=false){
 }
 function addFlexible(key,block){
  const i=item(key);if(!i||!BLOCK_MAP.has(block))return;
- const s={id:freshId(),kind:itemType(key),itemId:rawId(key),block,order:sessionsIn(block).length,start:null,end:null,minutes:null,repeatId:null};
+ const s={id:freshId(),kind:itemType(key),itemId:rawId(key),block,order:sessionsIn(block).length,start:null,end:null,minutes:null,color:null,repeatId:null};
  record().sessions.push(s);save();render();notice('Added to '+BLOCK_MAP.get(block).name+'.');
+}
+function changeSessionColor(id,color){
+ const existing=getSession(id);
+ if(!existing)return;
+ if(color!=='auto'&&!normalizeColor(color))return;
+ const session=ensureSessionMutable(id);
+ if(!session)return;
+ session.color=color==='auto'?null:normalizeColor(color);
+ // Personal color for this planned session only; another session stays unchanged.
+ save();render();
 }
 function removeSession(id){
  const s=getSession(id);if(!s)return;
@@ -401,17 +469,19 @@ function sessionCard(s){
    children.map(t=>'<div class="subtask-row '+(t.isDone?'is-done':'')+'"><button type="button" data-task-done="'+escapeHTML(t.id)+'" '+(currentDay?'':'disabled')+' aria-label="'+(t.isDone?'Undo':'Complete')+' subtask '+escapeHTML(t.title)+'">'+(t.isDone?'✓':'○')+'</button><span>'+escapeHTML(t.title)+'</span></div>').join('')+
    '</div></details>':'';
  const status=done?' · Done':'';
- return '<article class="session '+(count>1?'multi ':'')+(done?'is-done':'')+'" data-session="'+escapeHTML(s.id)+'" data-sort-block="'+s.block+'">'+
+ return '<article class="session '+(count>1?'multi ':'')+(done?'is-done':'')+'" style="--session-tint:'+resolvedColor(s)+'" data-session="'+escapeHTML(s.id)+'" data-sort-block="'+s.block+'">'+
   '<div class="session-head"><button class="drag-handle" type="button" data-drag-session="'+escapeHTML(s.id)+'" aria-label="Drag session for '+escapeHTML(title)+'" title="Drag to move or reorder">⠿</button>'+
   '<span class="session-title">'+escapeHTML(title)+'</span><span class="kind '+s.kind+'">'+(s.kind==='task'?'Task':'Habit')+'</span></div>'+
   '<div class="session-meta">'+(missing?'This item was removed in Super Productivity':dateText+subtaskText+status)+(s.repeatId?' · ↻ Repeats':'')+'</div>'+
-  linked+
-  '<div class="session-controls"><button type="button" class="tiny-btn" data-edit-session="'+escapeHTML(s.id)+'">Time / Move</button>'+
-  '<button type="button" class="tiny-btn" data-copy-session="'+escapeHTML(s.id)+'" '+(missing?'disabled':'')+' title="Plan another time for this same item">+ Session</button>'+
-  '<button type="button" class="tiny-btn icon-only" data-up-session="'+escapeHTML(s.id)+'" '+(idx===0?'disabled':'')+' aria-label="Move '+escapeHTML(title)+' up">↑</button>'+
-  '<button type="button" class="tiny-btn icon-only" data-down-session="'+escapeHTML(s.id)+'" '+(idx===list.length-1?'disabled':'')+' aria-label="Move '+escapeHTML(title)+' down">↓</button>'+
-  '<button type="button" class="tiny-btn icon-only" data-remove-session="'+escapeHTML(s.id)+'" aria-label="Remove this planned session" title="Remove session">×</button></div>'+
-  (actions?'<div class="action-row">'+actions+'</div>':'')+subtaskHtml+'</article>';
+  linked+(actions?'<div class="action-row">'+actions+'</div>':'')+subtaskHtml+
+  '<div class="session-footer"><button type="button" class="tiny-btn" data-edit-session="'+escapeHTML(s.id)+'">◷ Time / Move</button>'+
+  '<details class="session-more"><summary aria-label="More options for '+escapeHTML(title)+'">••• More</summary><div class="session-more-panel">'+
+  '<div class="menu-heading">Arrange and manage</div><div class="session-menu-actions">'+
+  '<button type="button" class="tiny-btn span-two" data-copy-session="'+escapeHTML(s.id)+'" '+(missing?'disabled':'')+'>+ Another session</button>'+
+  '<button type="button" class="tiny-btn" data-up-session="'+escapeHTML(s.id)+'" '+(idx===0?'disabled':'')+'>↑ Move up</button>'+
+  '<button type="button" class="tiny-btn" data-down-session="'+escapeHTML(s.id)+'" '+(idx===list.length-1?'disabled':'')+'>↓ Move down</button>'+
+  '<button type="button" class="tiny-btn span-two remove-session" data-remove-session="'+escapeHTML(s.id)+'">Remove from block</button></div>'+
+  colorChoices(s)+'</div></details></div></article>';
 }
 function blockCard(b){
  const items=sessionsIn(b.id),tasks=items.filter(s=>s.kind==='task').length,habits=items.filter(s=>s.kind==='habit').length;
@@ -505,7 +575,7 @@ function saveSession(event){
   }
  }
  const old=state.editor?.id?getSession(state.editor.id):null;
- const next=old?ensureSessionMutable(old.id):{id:freshId(),kind:itemType(key),itemId:rawId(key),order:sessionsIn(block).length,block,start:null,end:null,minutes:null,repeatId:null};
+ const next=old?ensureSessionMutable(old.id):{id:freshId(),kind:itemType(key),itemId:rawId(key),order:sessionsIn(block).length,block,start:null,end:null,minutes:null,color:null,repeatId:null};
  if(!old)record().sessions.push(next);
  const oldBlock=next.block;Object.assign(next,{block,start,end,minutes});
  const wantsRepeat=next.kind==='habit'&&$('session-repeat').checked;
@@ -621,7 +691,8 @@ document.addEventListener('pointerup',dragEnd);document.addEventListener('pointe
 document.addEventListener('click',e=>{
  const btn=e.target.closest('button');if(!btn||btn.disabled)return;
  const d=btn.dataset;
- if(d.planKey)openSessionEditor({key:d.planKey});
+ if(d.sessionColor)changeSessionColor(d.sessionColor,d.colorValue);
+ else if(d.planKey)openSessionEditor({key:d.planKey});
  else if(d.newBlock)openSessionEditor({block:d.newBlock});
  else if(d.editSession)openSessionEditor({id:d.editSession});
  else if(d.copySession){const orig=getSession(d.copySession);if(orig)openSessionEditor({key:uniqueKey(orig),block:orig.block});}
@@ -633,6 +704,10 @@ document.addEventListener('click',e=>{
  else if(d.habitInc)void habitUpdate(d.habitInc,1);
  else if(d.habitDec)void habitUpdate(d.habitDec,-1);
  else if(d.logHabit)openHabitLog(d.logHabit);
+});
+document.addEventListener('change',e=>{
+ const picker=e.target.closest('input[data-custom-session-color]');
+ if(picker)changeSessionColor(picker.dataset.customSessionColor,picker.value);
 });
 $('session-form').addEventListener('submit',saveSession);
 $('session-cancel').addEventListener('click',()=>closeDialog('session'));
