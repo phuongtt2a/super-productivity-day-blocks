@@ -64,7 +64,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .timeline-scroll{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding:3px 5px 10px 3px}
 .timeline{display:grid;grid-template-columns:repeat(4,minmax(224px,1fr));gap:12px;min-width:944px;align-items:stretch}
 .block{display:flex;flex-direction:column;min-width:0;min-height:460px;border:2px solid var(--stroke);border-radius:9px;overflow:hidden;box-shadow:3px 3px 0 var(--stroke);background:var(--surface)}
-.block.morning{--tint:#f4d977}.block.afternoon{--tint:#8bd4a2}.block.evening{--tint:#c9aff4}.block.night{--tint:#9fcbf4}
+.block.morning{--tint:#f4d977}.block.afternoon{--tint:#8bd4a2}.block.evening{--tint:#c9aff4}.block.night{--tint:#9299a6}
 .block-head{padding:15px 13px 11px;background:color-mix(in srgb,var(--tint) 48%,var(--surface-strong))}
 .block-head-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .period{display:flex;align-items:center;gap:7px;min-width:0}
@@ -88,9 +88,23 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .session-meta{font-size:10.5px;color:var(--muted);margin:5px 0 6px;line-height:1.35}
 .session.multi{border-left:4px solid var(--accent);padding-left:5px}
 .linked{display:inline-block;border:1px solid var(--accent);padding:3px 5px;border-radius:4px;margin-top:5px;color:var(--ink);font-size:10px;font-weight:800;background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
-.session-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;align-items:start;border-top:1px dashed var(--line);margin-top:9px;padding-top:8px}
-.session-footer>.tiny-btn,.session-more>summary{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:37px;padding:7px 6px;font-size:11px;font-weight:800;text-align:center}
-.session-footer>.tiny-btn{background:var(--surface-strong)}
+.session-toolbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:5px;border-top:1px dashed var(--line);margin-top:9px;padding-top:9px}
+.session-tool{display:grid;place-items:center;min-width:0;width:100%;min-height:36px;padding:6px 0;background:var(--surface-strong);border:1px solid var(--line);border-radius:5px;box-shadow:none}
+.session-tool:hover:not(:disabled){background:var(--hover);border-color:var(--accent)}
+.session-tool svg{display:block;width:17px;height:17px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.session-tool.primary{background:color-mix(in srgb,var(--accent) 13%,var(--surface-strong));border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+.session-tool[disabled]{opacity:.37}
+.session-popup-layer{position:fixed;inset:0;z-index:1200;background:rgba(10,18,15,.3)}
+.session-popup{position:fixed;width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:13px;background:var(--card-bg,#fff);color:var(--ink);border:2px solid var(--stroke);border-radius:8px;box-shadow:4px 5px 0 color-mix(in srgb,var(--ink) 60%,transparent)}
+.session-popup-head{display:flex;align-items:start;gap:12px;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px}
+.session-popup-head h2{font-size:15px;line-height:1.3;margin:0;font-weight:850;overflow-wrap:anywhere}
+.session-popup-content{display:grid;gap:12px}
+.session-popup-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.session-popup-actions .tiny-btn{font-size:11px;min-height:38px;white-space:normal;overflow-wrap:anywhere}
+.session-popup-actions .wide{grid-column:1/-1}
+.session-popup-actions .remove-session{border-color:color-mix(in srgb,#d66b59 60%,var(--line))}
+.session-popup .menu-heading{font-size:10px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.tiny-btn{background:var(--surface-strong)}
 .session-more{position:relative;min-width:0}
 .session-more>summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:var(--surface-strong);border-radius:5px;user-select:none}
 .session-more>summary::-webkit-details-marker{display:none}
@@ -110,7 +124,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .color-swatch[aria-pressed=true]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px}
 .custom-color{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:750}
 .custom-color input{width:42px;height:36px;min-height:36px;padding:2px;border:1px solid var(--line);background:var(--surface);border-radius:5px;cursor:pointer}
-.session .action-row{margin-top:8px;gap:6px}
+ .session .action-row{margin-top:8px;gap:6px}
 .session .action-row .tiny-btn{font-size:11px;font-weight:850;background:var(--surface-strong);min-height:35px}
 
 .tiny-btn{font-size:10px;min-height:32px;border-width:1px;box-shadow:none;padding:4px 6px}
@@ -234,6 +248,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
     <div class="error" id="log-error" role="alert"></div>
     <div class="dialog-actions"><button type="button" class="btn ghost" id="log-cancel">Cancel</button><button type="submit" class="btn primary" id="log-save">Add time</button></div>
   </form>
+</div>
+<div class="session-popup-layer hidden" id="more-backdrop">
+  <section class="session-popup" id="more-popup" role="dialog" aria-modal="true" aria-labelledby="more-title" tabindex="-1">
+    <div class="session-popup-head"><h2 id="more-title">Session options</h2><button type="button" class="tiny-btn icon-only" id="more-close" aria-label="Close session options" title="Close">×</button></div>
+    <div id="more-content" class="session-popup-content"></div>
+  </section>
 </div>
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <script>
