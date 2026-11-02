@@ -10,6 +10,7 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 - [ ] Use Plan instead of dragging, especially on a phone.
 - [ ] Reorder several tasks and habits together in one block with drag or the visible up/down arrow icons.
 - [ ] Each planned session is visually distinct, with enough contrast in light and dark modes.
+- [ ] The README shows the latest desktop timeline, session action controls, centered color popup, and mobile popup screenshots.
 - [ ] Each card shows exactly five icon-only actions in one horizontal row: Done (or relevant habit action), Up, Down, Time / Move, More.
 - [ ] Each icon has an accessible label and a tooltip; the **More** icon opens a centered popup without expanding or shifting other cards.
 - [ ] The two session buttons, **Add session** and **Remove**, sit side by side below the five icons in each card.
