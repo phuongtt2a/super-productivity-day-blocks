@@ -25,7 +25,12 @@ with sync_playwright() as p:
         assert page.locator('.block').count()==4
         assert page.locator('.linked').count()>=2
         save_image(page,"day-blocks-desktop.webp")
-        # Show the tidy secondary-action menu and the personalized color palette.
+        # Capture the two tidy rows of controls on an individual session card.
+        session_image=page.locator('.morning .session').first.screenshot(type="png",animations="disabled")
+        Image.open(BytesIO(session_image)).convert("RGB").save(
+            OUT/"session-actions.webp",format="WEBP",quality=88,method=6
+        )
+        # Show the centered color popup with the real timeline behind it.
         first=page.locator('.morning .session').first
         first.locator('[data-more-session]').click()
         assert page.locator('#more-popup[role="dialog"]').is_visible()
@@ -49,6 +54,11 @@ with sync_playwright() as p:
         phone.wait_for_selector('.morning [data-session]')
         assert phone.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
         save_image(phone,"day-blocks-phone.webp")
+        phone.locator('.morning [data-more-session]').first.click()
+        assert phone.locator('#more-popup[role="dialog"]').is_visible()
+        save_image(phone,"day-blocks-phone-popup.webp",full_page=False)
+        phone.locator('#more-close').click()
+        phone.evaluate("window.scrollTo(0,0)")
         phone.locator('#timeline-scroll').evaluate("(el)=>{el.scrollLeft=el.clientWidth*1.06}")
         save_image(phone,"day-blocks-phone-scroll.webp")
         phone.close()
@@ -59,6 +69,6 @@ with sync_playwright() as p:
         assert tiny.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
         save_image(tiny,"day-blocks-small-phone.webp")
         tiny.close()
-        print("Generated desktop, slate-night, icon-toolbar, popup and responsive phone screenshots")
+        print("Generated 9 screenshots: timeline, focused session controls, centered desktop/phone popup and responsive layouts")
     finally:
         browser.close()
