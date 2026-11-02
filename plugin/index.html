@@ -500,8 +500,8 @@ function saveSession(event){
   minutes=e-s;
  }else if($('session-duration').value.trim()){
   minutes=Number($('session-duration').value);
-  if(!Number.isFinite(minutes)||minutes<5||minutes>1440||minutes%5!==0){
-   $('session-error').textContent='Planned duration must be 5–1,440 minutes, in 5-minute steps.';return;
+  if(!Number.isFinite(minutes)||minutes<5||minutes>(b.to-b.from)||minutes%5!==0){
+   $('session-error').textContent='Planned duration must fit '+b.name+' (5–'+(b.to-b.from)+' minutes, in 5-minute steps). Add another session in a later block to continue.';return;
   }
  }
  const old=state.editor?.id?getSession(state.editor.id):null;
