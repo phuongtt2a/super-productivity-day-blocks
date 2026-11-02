@@ -1,5 +1,13 @@
 # Release notes
 
+## 0.1.1-beta.2 — One-line controls and a quiet daily timeline
+
+- Display five icon-only session actions on one row: Done or habit progress, Up, Down, Time / Move, and More, with accessible labels and tooltips.
+- The More button opens a proper, separate popup for additional sessions, removing one from a block, and choosing background colors.
+- Remove routine action confirmations that remained at the bottom of the screen; retain temporary error and safety messages.
+- Give Night a muted slate-gray treatment to distinguish the end of the day while respecting the app theme.
+- Preserve individual session colors, Unassigned on the left, mobile scrolling and all planning behavior.
+
 ## 0.1.1-beta.1 — Clearer sessions and personal colors
 
 - Simplified session cards: leave the main task/habit action and Time / Move visible, put additional controls under **More**.
