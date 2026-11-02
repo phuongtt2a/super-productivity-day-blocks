@@ -25,6 +25,15 @@ with sync_playwright() as p:
         assert page.locator('.block').count()==4
         assert page.locator('.linked').count()>=2
         save_image(page,"day-blocks-desktop.webp")
+        # Show the tidy secondary-action menu and the personalized color palette.
+        first=page.locator('.morning .session').first
+        first.locator('.session-more summary').click()
+        first.screenshot(path=str(OUT/"session-color-options.png"),animations="disabled")
+        Image.open(OUT/"session-color-options.png").convert("RGB").save(
+            OUT/"session-color-options.webp",format="WEBP",quality=88,method=6
+        )
+        (OUT/"session-color-options.png").unlink()
+        page.locator('.morning .session-more summary').first.click()
         page.locator('.afternoon .session.multi').first.screenshot(path=str(OUT/"continuing-session.png"))
         # Convert the focused detail to a compact webp for documentation.
         image=Image.open(OUT/"continuing-session.png").convert("RGB")
