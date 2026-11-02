@@ -104,6 +104,14 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .session-popup-actions .wide{grid-column:1/-1}
 .session-popup-actions .remove-session{border-color:color-mix(in srgb,#d66b59 60%,var(--line))}
 .session-popup .menu-heading{font-size:10px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.session-colors{display:flex;gap:5px;flex-wrap:wrap}
+.color-swatch{display:grid;place-items:center;width:34px;height:34px;min-height:34px;border-radius:5px;background:var(--surface);border:1px solid var(--line);padding:4px}
+.color-swatch .color-dot{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--swatch);border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);font-size:11px;color:#21382e}
+.color-swatch.auto .color-dot{background:conic-gradient(#e8bd71 0 25%,#9ccfae 25% 50%,#a7bde6 50% 75%,#d5b3e0 75% 100%)}
+.color-swatch[aria-pressed=true]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px}
+.custom-color{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:750}
+.custom-color input{width:42px;height:36px;min-height:36px;padding:2px;border:1px solid var(--line);background:var(--surface);border-radius:5px;cursor:pointer}
+
 .tiny-btn{background:var(--surface-strong)}
 .session-more{position:relative;min-width:0}
 .session-more>summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:var(--surface-strong);border-radius:5px;user-select:none}
