@@ -308,7 +308,7 @@ function colorChoices(s){
  '<label class="custom-color">Custom color <input type="color" data-custom-session-color="'+escapeHTML(s.id)+'" value="'+custom+'" aria-label="Choose a custom background color"></label>';
 }
 const STORAGE='day-blocks.plans.v1';
-const state={api:null,tasks:[],habits:[],projects:new Map(),day:'',today:'',data:{version:1,days:{},routines:[]},revision:0,writeQueue:Promise.resolve(),saving:false,showOverdue:false,showFinished:false,drag:null,editor:null,logHabit:null,demo:false,pendingSync:false,busy:new Set()};
+const state={api:null,tasks:[],habits:[],projects:new Map(),day:'',today:'',data:{version:1,days:{},routines:[]},revision:0,writeQueue:Promise.resolve(),saving:false,showOverdue:false,showFinished:false,drag:null,editor:null,logHabit:null,moreId:null,demo:false,pendingSync:false,busy:new Set()};
 const BLOCK_MAP=new Map(BLOCKS.map(b=>[b.id,b]));
 const localDay=(d=new Date())=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
 const toDate=key=>new Date(key+'T12:00:00');
@@ -427,7 +427,7 @@ function moveSession(id,block,targetId=null,after=false){
  targetOrder.splice(index,0,id);
  const s=ensureSessionMutable(id);if(!s)return;
  s.block=block;
- if(targetBlock!==block){s.start=null;s.end=null;notice('Moved to '+BLOCK_MAP.get(block).name+'. Set a new time if needed.');}
+ if(targetBlock!==block){s.start=null;s.end=null;}
  targetOrder.forEach((sid,i)=>{const row=ensureSessionMutable(sid);if(row)row.order=i;});
  if(targetBlock!==block)renumber(targetBlock);
  save();render();
@@ -435,7 +435,7 @@ function moveSession(id,block,targetId=null,after=false){
 function addFlexible(key,block){
  const i=item(key);if(!i||!BLOCK_MAP.has(block))return;
  const s={id:freshId(),kind:itemType(key),itemId:rawId(key),block,order:sessionsIn(block).length,start:null,end:null,minutes:null,color:null,repeatId:null};
- record().sessions.push(s);save();render();notice('Added to '+BLOCK_MAP.get(block).name+'.');
+ record().sessions.push(s);save();render();
 }
 function changeSessionColor(id,color){
  const existing=getSession(id);
@@ -484,6 +484,31 @@ function sourceCard(i){
   '<span class="kind '+i.kind+'">'+(i.kind==='task'?'Task':'Habit')+'</span>'+
   '<button type="button" class="source-plan" data-plan-key="'+escapeHTML(i.key)+'" aria-label="Plan '+escapeHTML(i.value.title)+'">Plan</button></article>';
 }
+const ICON_SHAPES={
+ check:'<circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.7L16 9.4"/>',
+ undo:'<path d="M9 9 4 12l5 3"/><path d="M4 12h10a6 6 0 1 1-2 11"/>',
+ up:'<path d="m6 14 6-6 6 6"/><path d="M12 8v12"/>',
+ down:'<path d="m6 10 6 6 6-6"/><path d="M12 4v12"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+ more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v5l3 2M9 2h6M18.5 5.5l2-2"/>',
+ none:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'
+};
+function uiIcon(name){
+ return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+(ICON_SHAPES[name]||ICON_SHAPES.none)+'</svg>';
+}
+function sessionPopupContent(s){
+ const itemRecord=item(uniqueKey(s));
+ const simpleCount=s.kind==='habit'&&itemRecord?.type==='ClickCounter'&&itemRecord?.isTrackStreaks&&habitGoal(itemRecord)===1;
+ const less=s.kind==='habit'&&itemRecord&&itemRecord.type!=='StopWatch'&&!simpleCount?
+   '<button type="button" class="tiny-btn wide" data-habit-dec="'+escapeHTML(s.itemId)+'" '+(state.day===state.today&&habitValue(itemRecord)>0?'':'disabled')+'>− Reduce habit count</button>':'';
+ return '<div class="menu-heading">Session options</div><div class="session-popup-actions">'+
+  '<button type="button" class="tiny-btn wide" data-copy-session="'+escapeHTML(s.id)+'" '+(itemRecord?'':'disabled')+'>+ Add another session</button>'+
+  less+
+  '<button type="button" class="tiny-btn wide remove-session" data-remove-session="'+escapeHTML(s.id)+'">Remove from block</button></div>'+
+  colorChoices(s);
+}
 function sessionCard(s){
  const recordItem=item(uniqueKey(s)),title=recordItem?.title||'Item no longer available';
  const count=linkedCount(s),list=sessionsIn(s.block),idx=list.findIndex(x=>x.id===s.id);
@@ -492,16 +517,23 @@ function sessionCard(s){
  const currentDay=state.day===state.today;
  const missing=!recordItem;
  const linked=count>1?'<div class="linked" title="These sessions refer to one item">↗ Continues across '+count+' sessions</div>':'';
- let actions='';
+ let action='<button type="button" class="session-tool primary" disabled aria-label="Unavailable task or habit" title="Unavailable">'+uiIcon('none')+'</button>';
+ let progress='';
  if(recordItem){
   if(s.kind==='task'){
-   actions='<button class="tiny-btn" data-task-done="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled title="Complete tasks from Today"')+'>'+(recordItem.isDone?'Undo done':'Mark done')+'</button>';
+   const label=recordItem.isDone?'Undo done':'Done';
+   action='<button type="button" class="session-tool primary" data-task-done="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+' aria-label="'+label+': '+escapeHTML(title)+'" title="'+label+'">'+uiIcon(recordItem.isDone?'undo':'check')+'</button>';
   }else if(recordItem.type==='StopWatch'){
-   actions='<button class="tiny-btn" data-log-habit="'+escapeHTML(s.itemId)+'" '+(recordItem.isOn||!currentDay?'disabled':'')+'>'+(recordItem.isOn?'Timer running':'Log time')+'</button>';
+   const label=recordItem.isOn?'Timer running':'Log time';
+   progress=niceMinutes(Math.round(habitValue(recordItem)/60000))+' / '+niceMinutes(Math.round(habitGoal(recordItem)/60000));
+   action='<button type="button" class="session-tool primary" data-log-habit="'+escapeHTML(s.itemId)+'" '+(recordItem.isOn||!currentDay?'disabled':'')+' aria-label="'+label+': '+escapeHTML(title)+'" title="'+label+'">'+uiIcon('timer')+'</button>';
   }else if(recordItem.type==='ClickCounter'&&recordItem.isTrackStreaks&&habitGoal(recordItem)===1){
-   actions='<button class="tiny-btn" data-habit-toggle="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+'>'+(habitDone(recordItem)?'Undo done':'Mark done')+'</button>';
+   const label=done?'Undo done':'Done';
+   action='<button type="button" class="session-tool primary" data-habit-toggle="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+' aria-label="'+label+': '+escapeHTML(title)+'" title="'+label+'">'+uiIcon(done?'undo':'check')+'</button>';
   }else{
-   actions='<button class="tiny-btn" data-habit-dec="'+escapeHTML(s.itemId)+'" '+(habitValue(recordItem)<=0||!currentDay?'disabled':'')+'>−</button><span class="note">'+habitValue(recordItem)+' / '+habitGoal(recordItem)+'</span><button class="tiny-btn" data-habit-inc="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+'>+</button>';
+   const label='Increase habit count';
+   progress=habitValue(recordItem)+' / '+habitGoal(recordItem);
+   action='<button type="button" class="session-tool primary" data-habit-inc="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+' aria-label="'+label+': '+escapeHTML(title)+'" title="'+label+'">'+uiIcon('plus')+'</button>';
   }
  }
  const children=s.kind==='task'&&recordItem?([...new Set(recordItem.subTaskIds||[])].map(id=>state.tasks.find(t=>t.id===id)).filter(Boolean)):[];
@@ -513,16 +545,13 @@ function sessionCard(s){
  return '<article class="session '+(count>1?'multi ':'')+(done?'is-done':'')+'" style="--session-tint:'+resolvedColor(s)+'" data-session="'+escapeHTML(s.id)+'" data-sort-block="'+s.block+'">'+
   '<div class="session-head"><button class="drag-handle" type="button" data-drag-session="'+escapeHTML(s.id)+'" aria-label="Drag session for '+escapeHTML(title)+'" title="Drag to move or reorder">⠿</button>'+
   '<span class="session-title">'+escapeHTML(title)+'</span><span class="kind '+s.kind+'">'+(s.kind==='task'?'Task':'Habit')+'</span></div>'+
-  '<div class="session-meta">'+(missing?'This item was removed in Super Productivity':dateText+subtaskText+status)+(s.repeatId?' · ↻ Repeats':'')+'</div>'+
-  linked+(actions?'<div class="action-row">'+actions+'</div>':'')+subtaskHtml+
-  '<div class="session-footer"><button type="button" class="tiny-btn" data-edit-session="'+escapeHTML(s.id)+'">◷ Time / Move</button>'+
-  '<details class="session-more"><summary aria-label="More options for '+escapeHTML(title)+'">••• More</summary><div class="session-more-panel">'+
-  '<div class="menu-heading">Arrange and manage</div><div class="session-menu-actions">'+
-  '<button type="button" class="tiny-btn span-two" data-copy-session="'+escapeHTML(s.id)+'" '+(missing?'disabled':'')+'>+ Another session</button>'+
-  '<button type="button" class="tiny-btn" data-up-session="'+escapeHTML(s.id)+'" '+(idx===0?'disabled':'')+'>↑ Move up</button>'+
-  '<button type="button" class="tiny-btn" data-down-session="'+escapeHTML(s.id)+'" '+(idx===list.length-1?'disabled':'')+'>↓ Move down</button>'+
-  '<button type="button" class="tiny-btn span-two remove-session" data-remove-session="'+escapeHTML(s.id)+'">Remove from block</button></div>'+
-  colorChoices(s)+'</div></details></div></article>';
+  '<div class="session-meta">'+(missing?'This item was removed in Super Productivity':dateText+subtaskText+status)+(progress?' · '+escapeHTML(progress):'')+(s.repeatId?' · ↻ Repeats':'')+'</div>'+
+  linked+subtaskHtml+
+  '<div class="session-toolbar" role="group" aria-label="Session actions for '+escapeHTML(title)+'">'+action+
+  '<button type="button" class="session-tool" data-up-session="'+escapeHTML(s.id)+'" '+(idx===0?'disabled':'')+' aria-label="Move up: '+escapeHTML(title)+'" title="Move up">'+uiIcon('up')+'</button>'+
+  '<button type="button" class="session-tool" data-down-session="'+escapeHTML(s.id)+'" '+(idx===list.length-1?'disabled':'')+' aria-label="Move down: '+escapeHTML(title)+'" title="Move down">'+uiIcon('down')+'</button>'+
+  '<button type="button" class="session-tool" data-edit-session="'+escapeHTML(s.id)+'" aria-label="Time / Move: '+escapeHTML(title)+'" title="Time / Move">'+uiIcon('clock')+'</button>'+
+  '<button type="button" class="session-tool" data-more-session="'+escapeHTML(s.id)+'" aria-label="More options: '+escapeHTML(title)+'" aria-haspopup="dialog" title="More">'+uiIcon('more')+'</button></div></article>';
 }
 function blockCard(b){
  const items=sessionsIn(b.id),tasks=items.filter(s=>s.kind==='task').length,habits=items.filter(s=>s.kind==='habit').length;
@@ -634,7 +663,7 @@ function saveSession(event){
  if(oldBlock!==block)renumber(oldBlock);
  renumber(block);
  save();closeDialog('session');render();
- notice(wantsRepeat?'Session saved · Habit repeats on scheduled days.':'Session saved.');
+
 }
 function openHabitLog(id){
  if(state.day!==state.today)return notice('Open Today to log completed habit time.');
@@ -663,7 +692,7 @@ async function saveHabitLog(event){
   const next=Number(current.countOnDay?.[state.day]||0)+Math.round(minutes*60000);
   if(state.api)await state.api.setCounter(id,next);
   h.countOnDay={...current.countOnDay,[state.day]:next};
-  closeDialog('log');render();notice('Time logged for '+h.title+'.');
+  closeDialog('log');render();
  }catch(err){$('log-error').textContent=String(err?.message||err);}
  finally{state.busy.delete('habit:'+id);}
 }
