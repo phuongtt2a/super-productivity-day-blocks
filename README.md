@@ -10,6 +10,10 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 
 ![Day Blocks dashboard with four time blocks in a single horizontal timeline](docs/screenshots/day-blocks-desktop.webp)
 
+**Simple controls, distinct sessions**
+
+![Session actions and personalized background-color choices](docs/screenshots/session-color-options.webp)
+
 <details>
 <summary>See the phone layout and a task continuing into another block</summary>
 
@@ -25,7 +29,9 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 
 - **Four blocks, one day.** Follow Morning (5 AM–noon), Afternoon (noon–6 PM), Evening (6–10 PM), and Night (10 PM–midnight) from left to right.
 - **Tasks and habits together.** Find today's items in **Unassigned**. Move them into a block with a drag or the **Plan** button. Expand a planned task to see and complete its subtasks.
-- **Choose your order.** Drag planned sessions to another position, or use the Up and Down controls.
+- **Clear session cards.** Your everyday action stays visible. Open **More** for another session, moving a card up or down, removing it, or choosing its color.
+- **Make colors yours.** Each session has a soft background by default. Pick a preset or set any custom color; the choice is saved for that individual session.
+- **Choose your order.** Drag planned sessions to another position, or use **More → Move up / Move down**.
 - **Plan the time you need.** Leave a session flexible, give it a planned duration, or choose an exact start and end time within its block.
 - **Continue in another block.** Use **+ Session** when one task or habit needs more than one part of the day. The linked cards still represent the same original item.
 - **Keep a daily habit routine.** Choose **Repeat this habit session on future scheduled days** when planning a habit you want to do regularly.
