@@ -99,11 +99,30 @@ with sync_playwright() as p:
         assert toolbar.locator('[data-down-session]').count()==1
         assert toolbar.locator('[data-edit-session]').count()==1
         assert toolbar.locator('[data-more-session]').count()==1
-        # A separate popup is not constrained inside the card and can close with Escape.
+        # The two equal-width session buttons are on the card, outside the popup.
+        secondary=page.locator('.morning .session-secondary')
+        assert secondary.locator('button').count()==2
+        assert secondary.locator('[data-copy-session]').count()==1
+        assert secondary.locator('[data-remove-session]').count()==1
+        assert secondary.evaluate("(el)=>getComputedStyle(el).gridTemplateColumns.split(' ').length===2")
         page.locator('.morning [data-more-session]').click()
         assert page.locator('#more-backdrop:not(.hidden)').count()==1
         assert page.locator('#more-popup[role="dialog"]').is_visible()
-        assert page.locator('#more-content [data-copy-session]').is_visible()
+        assert page.locator('#more-content [data-copy-session]').count()==0
+        assert page.locator('#more-content [data-remove-session]').count()==0
+        # Popup is centered in the viewport.
+        rect=page.locator('#more-popup').bounding_box()
+        assert abs(rect['x']+rect['width']/2-840)<3
+        assert abs(rect['y']+rect['height']/2-512)<3
+
+        # Repeated app data refreshes and synced data hooks must not close it.
+        page.evaluate("window.__hooks.dataChanged()")
+        page.wait_for_function("document.querySelector('#more-backdrop:not(.hidden)')!==null")
+        page.evaluate("window.__hooks.persistedDataChanged({key:'day-blocks.plans.v1'})")
+        page.wait_for_function("document.querySelector('#more-backdrop:not(.hidden)')!==null")
+        page.evaluate("refresh()")
+        page.wait_for_function("document.querySelector('#more-backdrop:not(.hidden)')!==null")
+        assert page.locator('#more-popup').is_visible()
         page.keyboard.press("Escape")
         assert page.locator('#more-backdrop.hidden').count()==1
         page.locator('.morning [data-more-session]').click()
@@ -117,7 +136,7 @@ with sync_playwright() as p:
         print("palette, arbitrary hex selection and menu persistence: PASS")
 
         # Additional linked Afternoon session shares the same native ID.
-        page.locator('#more-content [data-copy-session]').click()
+        page.locator('.morning [data-copy-session]').click()
         page.locator('#session-block').select_option('afternoon')
         page.locator('#exact-time').check()
         page.locator('#session-start').fill("14:00")
@@ -182,8 +201,7 @@ with sync_playwright() as p:
         assert page.locator('.morning .session-title',has_text="Drink water").count()==1
         assert page.locator('#unassigned [data-source-key="habit:water"]').count()==0
         # Removing from one day does not remove the future recurring preference.
-        page.locator('.morning [data-more-session]').click()
-        page.locator('#more-content [data-remove-session]').click()
+        page.locator('.morning [data-remove-session]').click()
         assert page.locator('.morning .session-title',has_text="Drink water").count()==0
         page.locator('#next-day').click()
         assert page.locator('.morning .session-title',has_text="Drink water").count()==1
@@ -204,8 +222,7 @@ with sync_playwright() as p:
         print("goal-met habit extra time is native, planned sessions remain independent: PASS")
 
         # Reorder and move individual sessions without duplicating a source item.
-        page.locator('.morning [data-more-session]').first.click()
-        page.locator('#more-content [data-copy-session]').click()
+        page.locator('.morning [data-copy-session]').first.click()
         page.locator('#session-block').select_option("morning")
         page.locator('#session-save').click()
         all_before=page.locator('.morning [data-session]').count()
@@ -241,6 +258,13 @@ with sync_playwright() as p:
         assert restored.locator('.session-toolbar').count()>=1
         assert restored.locator('.session-toolbar [data-more-session]').count()>=1
         assert restored.locator('.session-toolbar').first.locator('button').count()==5
+        assert restored.locator('.session-secondary').first.locator('button').count()==2
+        # The centered popup remains inside a narrow mobile viewport.
+        restored.locator('.morning [data-more-session]').first.click()
+        phone_popup=restored.locator('#more-popup').bounding_box()
+        assert phone_popup['x']>=0 and phone_popup['x']+phone_popup['width']<=321
+        assert phone_popup['y']>=0 and phone_popup['y']+phone_popup['height']<=691
+        restored.locator('#more-close').click()
         restored.locator('#unassigned [data-plan-key="task:review"]').click()
         restored.locator('#session-block').select_option("evening")
         restored.locator('#session-save').click()
