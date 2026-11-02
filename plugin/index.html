@@ -90,6 +90,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .session-controls{display:flex;gap:4px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:7px}
 .tiny-btn{font-size:10px;min-height:32px;border-width:1px;box-shadow:none;padding:4px 6px}
 .tiny-btn.icon-only{min-width:30px}
+.subtask-panel{margin-top:8px;padding-top:7px;border-top:1px dotted var(--line)}
+.subtask-panel summary{cursor:pointer;font-size:11px;font-weight:800;color:var(--ink)}
+.subtask-items{display:grid;gap:5px;margin-top:7px}
+.subtask-row{display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+.subtask-row button{font-size:11px;min-width:30px;min-height:30px;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+.subtask-row.is-done{text-decoration:line-through;color:var(--muted)}
 .action-row{margin-top:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .action-row .tiny-btn{background:color-mix(in srgb,var(--tint,#bddac8) 14%,var(--surface))}
 .block-add{margin:0 9px 10px;padding:9px 6px;border:1.5px dashed var(--accent);border-radius:5px;background:transparent;font-weight:800;font-size:11px;min-height:41px;color:var(--ink)}
@@ -389,7 +395,11 @@ function sessionCard(s){
    actions='<button class="tiny-btn" data-habit-dec="'+escapeHTML(s.itemId)+'" '+(habitValue(recordItem)<=0||!currentDay?'disabled':'')+'>−</button><span class="note">'+habitValue(recordItem)+' / '+habitGoal(recordItem)+'</span><button class="tiny-btn" data-habit-inc="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+'>+</button>';
   }
  }
- const subtaskText=s.kind==='task'&&recordItem?.subTaskIds?.length?' · '+recordItem.subTaskIds.length+' subtasks':'';
+ const children=s.kind==='task'&&recordItem?([...new Set(recordItem.subTaskIds||[])].map(id=>state.tasks.find(t=>t.id===id)).filter(Boolean)):[];
+ const subtaskText=children.length?' · '+children.length+' subtasks':'';
+ const subtaskHtml=children.length?'<details class="subtask-panel"><summary>Subtasks · '+children.filter(t=>t.isDone).length+'/'+children.length+' done</summary><div class="subtask-items">'+
+   children.map(t=>'<div class="subtask-row '+(t.isDone?'is-done':'')+'"><button type="button" data-task-done="'+escapeHTML(t.id)+'" '+(currentDay?'':'disabled')+' aria-label="'+(t.isDone?'Undo':'Complete')+' subtask '+escapeHTML(t.title)+'">'+(t.isDone?'✓':'○')+'</button><span>'+escapeHTML(t.title)+'</span></div>').join('')+
+   '</div></details>':'';
  const status=done?' · Done':'';
  return '<article class="session '+(count>1?'multi ':'')+(done?'is-done':'')+'" data-session="'+escapeHTML(s.id)+'" data-sort-block="'+s.block+'">'+
   '<div class="session-head"><button class="drag-handle" type="button" data-drag-session="'+escapeHTML(s.id)+'" aria-label="Drag session for '+escapeHTML(title)+'" title="Drag to move or reorder">⠿</button>'+
@@ -401,7 +411,7 @@ function sessionCard(s){
   '<button type="button" class="tiny-btn icon-only" data-up-session="'+escapeHTML(s.id)+'" '+(idx===0?'disabled':'')+' aria-label="Move '+escapeHTML(title)+' up">↑</button>'+
   '<button type="button" class="tiny-btn icon-only" data-down-session="'+escapeHTML(s.id)+'" '+(idx===list.length-1?'disabled':'')+' aria-label="Move '+escapeHTML(title)+' down">↓</button>'+
   '<button type="button" class="tiny-btn icon-only" data-remove-session="'+escapeHTML(s.id)+'" aria-label="Remove this planned session" title="Remove session">×</button></div>'+
-  (actions?'<div class="action-row">'+actions+'</div>':'')+'</article>';
+  (actions?'<div class="action-row">'+actions+'</div>':'')+subtaskHtml+'</article>';
 }
 function blockCard(b){
  const items=sessionsIn(b.id),tasks=items.filter(s=>s.kind==='task').length,habits=items.filter(s=>s.kind==='habit').length;
