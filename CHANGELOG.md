@@ -1,6 +1,14 @@
 # Release notes
 
-## 0.1.0 — First preview (refined session cards)
+## 0.1.1-beta.1 — Clearer sessions and personal colors
+
+- Simplified session cards: leave the main task/habit action and Time / Move visible, put additional controls under **More**.
+- Give sessions soft background colors for clearer boundaries. Choose from eight colors, use a custom color picker, or revert to automatic.
+- Save colors per individual planned session, including after moving or reopening it. Linked sessions may have separate colors.
+- Keep Unassigned on the left to preserve convenient dragging.
+- Preserve the four-column timeline and all existing task, habit, mobile and planning behavior.
+
+## 0.1.0 — First preview
 
 Welcome to **Day Blocks**! Plan today's tasks and habits in a continuous, four-part timeline.
 
