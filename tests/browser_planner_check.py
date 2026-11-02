@@ -89,23 +89,35 @@ with sync_playwright() as p:
         assert page.locator('.morning .session-meta').first.inner_text().startswith("09:00–11:00")
         print("scheduled item leaves unassigned, precise time saved: PASS")
 
-        # The menu separates everyday actions from secondary controls.
-        assert page.locator('.morning .session-footer > [data-edit-session]').count()==1
-        assert page.locator('.morning .session-more summary').count()==1
-        assert not page.locator('.morning [data-copy-session]').is_visible()
-        page.locator('.morning .session-more summary').click()
-        assert page.locator('.morning [data-copy-session]').is_visible()
+        # Exactly five icon-only actions stay in one row (Done, up, down, time, more).
+        assert page.locator('.morning .session-toolbar').count()==1
+        toolbar=page.locator('.morning .session-toolbar')
+        assert toolbar.locator('button').count()==5
+        assert toolbar.locator('button').evaluate_all("(els)=>els.every(el=>el.querySelector('svg')&&el.textContent.trim()===''&&el.getAttribute('aria-label'))")
+        assert toolbar.locator('[data-task-done="plan"]').get_attribute("title")=="Done"
+        assert toolbar.locator('[data-up-session]').count()==1
+        assert toolbar.locator('[data-down-session]').count()==1
+        assert toolbar.locator('[data-edit-session]').count()==1
+        assert toolbar.locator('[data-more-session]').count()==1
+        # A separate popup is not constrained inside the card and can close with Escape.
+        page.locator('.morning [data-more-session]').click()
+        assert page.locator('#more-backdrop:not(.hidden)').count()==1
+        assert page.locator('#more-popup[role="dialog"]').is_visible()
+        assert page.locator('#more-content [data-copy-session]').is_visible()
+        page.keyboard.press("Escape")
+        assert page.locator('#more-backdrop.hidden').count()==1
+        page.locator('.morning [data-more-session]').click()
 
         # Choose a custom color for one session without changing another card.
-        page.locator('.morning [data-session-color][data-color-value="lilac"]').click()
+        page.locator('#more-content [data-session-color][data-color-value="lilac"]').click()
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#c8b2e9"
-        page.locator('.morning [data-custom-session-color]').fill("#bcacf0")
+        page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
-        assert page.locator('.morning .session-more').first.get_attribute('open') is not None
+        assert page.locator('#more-backdrop:not(.hidden)').count()==1
         print("palette, arbitrary hex selection and menu persistence: PASS")
 
         # Additional linked Afternoon session shares the same native ID.
-        page.locator('.morning [data-copy-session]').click()
+        page.locator('#more-content [data-copy-session]').click()
         page.locator('#session-block').select_option('afternoon')
         page.locator('#exact-time').check()
         page.locator('#session-start').fill("14:00")
@@ -170,8 +182,8 @@ with sync_playwright() as p:
         assert page.locator('.morning .session-title',has_text="Drink water").count()==1
         assert page.locator('#unassigned [data-source-key="habit:water"]').count()==0
         # Removing from one day does not remove the future recurring preference.
-        page.locator('.morning .session-more summary').click()
-        page.locator('.morning [data-remove-session]').click()
+        page.locator('.morning [data-more-session]').click()
+        page.locator('#more-content [data-remove-session]').click()
         assert page.locator('.morning .session-title',has_text="Drink water").count()==0
         page.locator('#next-day').click()
         assert page.locator('.morning .session-title',has_text="Drink water").count()==1
@@ -192,13 +204,12 @@ with sync_playwright() as p:
         print("goal-met habit extra time is native, planned sessions remain independent: PASS")
 
         # Reorder and move individual sessions without duplicating a source item.
-        page.locator('.morning .session-more summary').first.click()
-        page.locator('.morning [data-copy-session]').first.click()
+        page.locator('.morning [data-more-session]').first.click()
+        page.locator('#more-content [data-copy-session]').click()
         page.locator('#session-block').select_option("morning")
         page.locator('#session-save').click()
         all_before=page.locator('.morning [data-session]').count()
         assert all_before>=2
-        page.locator('.morning .session-more summary').first.click()
         second=page.locator('.morning [data-down-session]').first
         assert second.is_enabled()
         second.click()
@@ -227,8 +238,9 @@ with sync_playwright() as p:
         assert restored.evaluate("getComputedStyle(document.querySelector('#timeline')).gridAutoFlow")=="column"
         # Unassigned remains a left sidebar on desktop, a practical drag origin.
         assert page.evaluate("document.querySelector('#backlog').getBoundingClientRect().left < document.querySelector('#timeline').getBoundingClientRect().left")
-        assert restored.locator('.session-footer').count()>=1
-        assert restored.locator('.session-more summary').count()>=1
+        assert restored.locator('.session-toolbar').count()>=1
+        assert restored.locator('.session-toolbar [data-more-session]').count()>=1
+        assert restored.locator('.session-toolbar').first.locator('button').count()==5
         restored.locator('#unassigned [data-plan-key="task:review"]').click()
         restored.locator('#session-block').select_option("evening")
         restored.locator('#session-save').click()
@@ -272,7 +284,8 @@ with sync_playwright() as p:
         page.mouse.up()
         assert page.locator('.evening .session-title',has_text="Review design").count()==0
         assert page.locator('#unassigned [data-source-key="task:review"]').count()==1
-        print("cross-block pointer move and drag back to Unassigned: PASS")
+        assert page.locator('#toast.hidden').count()==1
+        print("cross-block pointer move and drag back to Unassigned without routine toasts: PASS")
 
         # Native completion is shared across all planned sessions.
         page.locator('.afternoon [data-task-done="plan"]').click()
