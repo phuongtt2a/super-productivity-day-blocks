@@ -94,11 +94,17 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .session-tool svg{display:block;width:17px;height:17px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .session-tool.primary{background:color-mix(in srgb,var(--accent) 13%,var(--surface-strong));border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
 .session-tool[disabled]{opacity:.37}
-.session-popup-layer{position:fixed;inset:0;z-index:1200;background:rgba(10,18,15,.3)}
-.session-popup{position:fixed;width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:13px;background:var(--card-bg,#fff);color:var(--ink);border:2px solid var(--stroke);border-radius:8px;box-shadow:4px 5px 0 color-mix(in srgb,var(--ink) 60%,transparent)}
+.session-popup-layer{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:12px;background:rgba(10,18,15,.42)}
+.session-popup{position:relative;width:min(390px,100%);max-height:calc(100dvh - 24px);overflow:auto;padding:16px;background:var(--card-bg,#fff);color:var(--ink);border:2px solid var(--stroke);border-radius:8px;box-shadow:4px 5px 0 color-mix(in srgb,var(--ink) 60%,transparent)}
 .session-popup-head{display:flex;align-items:start;gap:12px;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px}
 .session-popup-head h2{font-size:15px;line-height:1.3;margin:0;font-weight:850;overflow-wrap:anywhere}
 .session-popup-content{display:grid;gap:12px}
+.session-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:7px}
+.session-secondary button{min-width:0;min-height:34px;font-size:11px;font-weight:780;box-shadow:none;padding:5px 5px;white-space:normal;overflow-wrap:anywhere}
+.session-secondary .add-session{background:color-mix(in srgb,var(--accent) 9%,var(--surface-strong))}
+.session-secondary .remove-session{background:var(--surface);border-color:color-mix(in srgb,#c97a67 47%,var(--line))}
+.session-secondary .remove-session:hover{border-color:color-mix(in srgb,#c97a67 80%,var(--line))}
+
 .session-popup-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 .session-popup-actions .tiny-btn{font-size:11px;min-height:38px;white-space:normal;overflow-wrap:anywhere}
 .session-popup-actions .wide{grid-column:1/-1}
@@ -441,18 +447,11 @@ function openMore(id,button){
  const session=getSession(id);
  if(!session)return;
  state.moreId=id;
- $('more-title').textContent=item(uniqueKey(session))?.title||'Session options';
+ $('more-title').textContent='Background color · '+(item(uniqueKey(session))?.title||'Session');
  $('more-content').innerHTML=sessionPopupContent(session);
  const layer=$('more-backdrop'),popup=$('more-popup');
  layer.classList.remove('hidden');
- const anchor=button.getBoundingClientRect();
- const size=popup.getBoundingClientRect();
- const pad=12;
- const left=Math.min(Math.max(pad,anchor.right-size.width),Math.max(pad,window.innerWidth-size.width-pad));
- let top=anchor.bottom+8;
- if(top+size.height>window.innerHeight-pad)top=anchor.top-size.height-8;
- top=Math.min(Math.max(pad,top),Math.max(pad,window.innerHeight-size.height-pad));
- popup.style.left=left+'px';popup.style.top=top+'px';
+ // The popup is centered by its overlay, never tied to the card position.
  $('more-close').focus();
 }
 function closeMore(restoreFocus=true){
@@ -532,12 +531,8 @@ function sessionPopupContent(s){
  const itemRecord=item(uniqueKey(s));
  const simpleCount=s.kind==='habit'&&itemRecord?.type==='ClickCounter'&&itemRecord?.isTrackStreaks&&habitGoal(itemRecord)===1;
  const less=s.kind==='habit'&&itemRecord&&itemRecord.type!=='StopWatch'&&!simpleCount?
-   '<button type="button" class="tiny-btn wide" data-habit-dec="'+escapeHTML(s.itemId)+'" '+(state.day===state.today&&habitValue(itemRecord)>0?'':'disabled')+'>− Reduce habit count</button>':'';
- return '<div class="menu-heading">Session options</div><div class="session-popup-actions">'+
-  '<button type="button" class="tiny-btn wide" data-copy-session="'+escapeHTML(s.id)+'" '+(itemRecord?'':'disabled')+'>+ Add another session</button>'+
-  less+
-  '<button type="button" class="tiny-btn wide remove-session" data-remove-session="'+escapeHTML(s.id)+'">Remove from block</button></div>'+
-  colorChoices(s);
+   '<div class="menu-heading">Habit progress</div><button type="button" class="tiny-btn" data-habit-dec="'+escapeHTML(s.itemId)+'" '+(state.day===state.today&&habitValue(itemRecord)>0?'':'disabled')+'>− Reduce habit count</button>':'';
+ return colorChoices(s)+less;
 }
 function sessionCard(s){
  const recordItem=item(uniqueKey(s)),title=recordItem?.title||'Item no longer available';
@@ -581,7 +576,9 @@ function sessionCard(s){
   '<button type="button" class="session-tool" data-up-session="'+escapeHTML(s.id)+'" '+(idx===0?'disabled':'')+' aria-label="Move up: '+escapeHTML(title)+'" title="Move up">'+uiIcon('up')+'</button>'+
   '<button type="button" class="session-tool" data-down-session="'+escapeHTML(s.id)+'" '+(idx===list.length-1?'disabled':'')+' aria-label="Move down: '+escapeHTML(title)+'" title="Move down">'+uiIcon('down')+'</button>'+
   '<button type="button" class="session-tool" data-edit-session="'+escapeHTML(s.id)+'" aria-label="Time / Move: '+escapeHTML(title)+'" title="Time / Move">'+uiIcon('clock')+'</button>'+
-  '<button type="button" class="session-tool" data-more-session="'+escapeHTML(s.id)+'" aria-label="More options: '+escapeHTML(title)+'" aria-haspopup="dialog" title="More">'+uiIcon('more')+'</button></div></article>';
+  '<button type="button" class="session-tool" data-more-session="'+escapeHTML(s.id)+'" aria-label="Background color and more options: '+escapeHTML(title)+'" aria-haspopup="dialog" title="More · Colors">'+uiIcon('more')+'</button></div>'+
+  '<div class="session-secondary"><button type="button" class="tiny-btn add-session" data-copy-session="'+escapeHTML(s.id)+'" '+(missing?'disabled':'')+' aria-label="Add another session for '+escapeHTML(title)+'" title="Add another session">+ Add session</button>'+
+  '<button type="button" class="tiny-btn remove-session" data-remove-session="'+escapeHTML(s.id)+'" aria-label="Remove this session from '+escapeHTML(BLOCK_MAP.get(s.block).name)+'" title="Remove from block">Remove</button></div></article>';
 }
 function blockCard(b){
  const items=sessionsIn(b.id),tasks=items.filter(s=>s.kind==='task').length,habits=items.filter(s=>s.kind==='habit').length;
@@ -596,7 +593,9 @@ function blockCard(b){
   '<button type="button" class="block-add" data-new-block="'+b.id+'">+ Add to '+b.name+'</button></section>';
 }
 function render(){
- closeMore(false);
+ // Automatic native updates and the periodic refresh must not dismiss a popup.
+ // The popup is outside #timeline and remains available while its session exists.
+ if(state.moreId&&!getSession(state.moreId))closeMore(false);
  if(!state.day)state.day=state.today||localDay();
  const list=sourceItems(),sessions=visibleSessions(),completed=new Set(sessions.filter(s=>{const v=item(uniqueKey(s));return s.kind==='habit'?v&&habitDone(v):v&&v.isDone}).map(uniqueKey));
  $('day-label').textContent=humanDay(state.day);
@@ -827,9 +826,9 @@ $('session-item').addEventListener('change',()=>{
 });
 $('show-overdue').addEventListener('click',()=>{state.showOverdue=!state.showOverdue;render();});
 $('show-finished').addEventListener('click',()=>{state.showFinished=!state.showFinished;render();});
-$('prev-day').addEventListener('click',()=>{state.day=plusDays(state.day,-1);render();});
-$('next-day').addEventListener('click',()=>{state.day=plusDays(state.day,1);render();});
-$('go-today').addEventListener('click',()=>{state.day=state.today;render();});
+$('prev-day').addEventListener('click',()=>{closeMore(false);state.day=plusDays(state.day,-1);render();});
+$('next-day').addEventListener('click',()=>{closeMore(false);state.day=plusDays(state.day,1);render();});
+$('go-today').addEventListener('click',()=>{closeMore(false);state.day=state.today;render();});
 $('refresh').addEventListener('click',()=>void refresh());
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('more-backdrop').classList.contains('hidden'))closeMore();else if(!$('session-backdrop').classList.contains('hidden'))closeDialog('session');else if(!$('log-backdrop').classList.contains('hidden'))closeDialog('log');else clearNotice();});
 function demo(){
