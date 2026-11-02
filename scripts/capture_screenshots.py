@@ -27,13 +27,14 @@ with sync_playwright() as p:
         save_image(page,"day-blocks-desktop.webp")
         # Show the tidy secondary-action menu and the personalized color palette.
         first=page.locator('.morning .session').first
-        first.locator('.session-more summary').click()
-        first.screenshot(path=str(OUT/"session-color-options.png"),animations="disabled")
+        first.locator('[data-more-session]').click()
+        assert page.locator('#more-popup[role="dialog"]').is_visible()
+        page.locator('#more-popup').screenshot(path=str(OUT/"session-color-options.png"),animations="disabled")
         Image.open(OUT/"session-color-options.png").convert("RGB").save(
             OUT/"session-color-options.webp",format="WEBP",quality=88,method=6
         )
         (OUT/"session-color-options.png").unlink()
-        page.locator('.morning .session-more summary').first.click()
+        page.locator('#more-close').click()
         page.locator('.afternoon .session.multi').first.screenshot(path=str(OUT/"continuing-session.png"))
         # Convert the focused detail to a compact webp for documentation.
         image=Image.open(OUT/"continuing-session.png").convert("RGB")
@@ -56,6 +57,6 @@ with sync_playwright() as p:
         assert tiny.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
         save_image(tiny,"day-blocks-small-phone.webp")
         tiny.close()
-        print("Generated desktop, linked-session and responsive phone screenshots")
+        print("Generated desktop, slate-night, icon-toolbar, popup and responsive phone screenshots")
     finally:
         browser.close()
