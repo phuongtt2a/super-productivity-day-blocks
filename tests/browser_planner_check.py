@@ -89,6 +89,21 @@ with sync_playwright() as p:
         assert page.locator('.morning .session-meta').first.inner_text().startswith("09:00–11:00")
         print("scheduled item leaves unassigned, precise time saved: PASS")
 
+        # The menu separates everyday actions from secondary controls.
+        assert page.locator('.morning .session-footer > [data-edit-session]').count()==1
+        assert page.locator('.morning .session-more summary').count()==1
+        assert not page.locator('.morning [data-copy-session]').is_visible()
+        page.locator('.morning .session-more summary').click()
+        assert page.locator('.morning [data-copy-session]').is_visible()
+
+        # Choose a custom color for one session without changing another card.
+        page.locator('.morning [data-session-color][data-color-value="lilac"]').click()
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#c8b2e9"
+        page.locator('.morning [data-custom-session-color]').fill("#bcacf0")
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
+        assert page.locator('.morning .session-more').first.get_attribute('open') is not None
+        print("palette, arbitrary hex selection and menu persistence: PASS")
+
         # Additional linked Afternoon session shares the same native ID.
         page.locator('.morning [data-copy-session]').click()
         page.locator('#session-block').select_option('afternoon')
@@ -98,6 +113,9 @@ with sync_playwright() as p:
         page.locator('#session-save').click()
         assert page.locator('.morning .session.multi').count()==1
         assert page.locator('.afternoon .session.multi').count()==1
+        assert page.locator('.morning .session.multi').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
+        afternoon_color=page.locator('.afternoon .session.multi').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")
+        assert afternoon_color!="#bcacf0"
         assert page.locator('.linked',has_text="2 sessions").count()==2
         assert page.locator('#metrics .metric').first.inner_text().startswith("1")
         assert page.locator('#unassigned [data-source-key="task:plan"]').count()==0
@@ -152,6 +170,7 @@ with sync_playwright() as p:
         assert page.locator('.morning .session-title',has_text="Drink water").count()==1
         assert page.locator('#unassigned [data-source-key="habit:water"]').count()==0
         # Removing from one day does not remove the future recurring preference.
+        page.locator('.morning .session-more summary').click()
         page.locator('.morning [data-remove-session]').click()
         assert page.locator('.morning .session-title',has_text="Drink water").count()==0
         page.locator('#next-day').click()
@@ -173,11 +192,13 @@ with sync_playwright() as p:
         print("goal-met habit extra time is native, planned sessions remain independent: PASS")
 
         # Reorder and move individual sessions without duplicating a source item.
+        page.locator('.morning .session-more summary').first.click()
         page.locator('.morning [data-copy-session]').first.click()
         page.locator('#session-block').select_option("morning")
         page.locator('#session-save').click()
         all_before=page.locator('.morning [data-session]').count()
         assert all_before>=2
+        page.locator('.morning .session-more summary').first.click()
         second=page.locator('.morning [data-down-session]').first
         assert second.is_enabled()
         second.click()
@@ -191,16 +212,23 @@ with sync_playwright() as p:
         assert TODAY in data["days"]
         assert any(s["itemId"]=="plan" for s in data["days"][TODAY]["sessions"])
         assert len(data["routines"])==1
-        print("synced preferences and independent session records: PASS")
+        morning_plan=[s for s in data["days"][TODAY]["sessions"] if s["itemId"]=="plan" and s["block"]=="morning"]
+        assert morning_plan and any(s.get("color")=="#bcacf0" for s in morning_plan)
+        print("synced preferences and per-session custom colors: PASS")
 
         restored=browser.new_page(viewport={"width":320,"height":690},has_touch=True,is_mobile=True)
         install(restored,saved)
         assert restored.locator('.morning .session-title',has_text="Prepare quarterly plan").count()>=1
+        assert restored.locator('.morning [data-session]').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
         assert restored.locator('.evening .session-title',has_text="Read 60 minutes").count()==1
         assert restored.locator('#timeline .block').count()==4
         assert restored.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
         assert restored.evaluate("document.querySelector('#timeline-scroll').scrollWidth>document.querySelector('#timeline-scroll').clientWidth")
         assert restored.evaluate("getComputedStyle(document.querySelector('#timeline')).gridAutoFlow")=="column"
+        # Unassigned remains a left sidebar on desktop, a practical drag origin.
+        assert page.evaluate("document.querySelector('#backlog').getBoundingClientRect().left < document.querySelector('#timeline').getBoundingClientRect().left")
+        assert restored.locator('.session-footer').count()>=1
+        assert restored.locator('.session-more summary').count()>=1
         restored.locator('#unassigned [data-plan-key="task:review"]').click()
         restored.locator('#session-block').select_option("evening")
         restored.locator('#session-save').click()
