@@ -374,18 +374,19 @@ function sessionCard(s){
  const count=linkedCount(s),list=sessionsIn(s.block),idx=list.findIndex(x=>x.id===s.id);
  const dateText=s.start&&s.end?escapeHTML(s.start)+'–'+escapeHTML(s.end):(sessionDuration(s)?niceMinutes(sessionDuration(s))+' planned':'Flexible time');
  const done=s.kind==='habit'?(recordItem?habitDone(recordItem):false):!!recordItem?.isDone;
+ const currentDay=state.day===state.today;
  const missing=!recordItem;
  const linked=count>1?'<div class="linked" title="These sessions refer to one item">↗ Continues across '+count+' sessions</div>':'';
  let actions='';
  if(recordItem){
   if(s.kind==='task'){
-   actions='<button class="tiny-btn" data-task-done="'+escapeHTML(s.itemId)+'">'+(recordItem.isDone?'Undo done':'Mark done')+'</button>';
+   actions='<button class="tiny-btn" data-task-done="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled title="Complete tasks from Today"')+'>'+(recordItem.isDone?'Undo done':'Mark done')+'</button>';
   }else if(recordItem.type==='StopWatch'){
-   actions='<button class="tiny-btn" data-log-habit="'+escapeHTML(s.itemId)+'" '+(recordItem.isOn?'disabled':'')+'>'+(recordItem.isOn?'Timer running':'Log time')+'</button>';
+   actions='<button class="tiny-btn" data-log-habit="'+escapeHTML(s.itemId)+'" '+(recordItem.isOn||!currentDay?'disabled':'')+'>'+(recordItem.isOn?'Timer running':'Log time')+'</button>';
   }else if(recordItem.type==='ClickCounter'&&recordItem.isTrackStreaks&&habitGoal(recordItem)===1){
-   actions='<button class="tiny-btn" data-habit-toggle="'+escapeHTML(s.itemId)+'">'+(habitDone(recordItem)?'Undo done':'Mark done')+'</button>';
+   actions='<button class="tiny-btn" data-habit-toggle="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+'>'+(habitDone(recordItem)?'Undo done':'Mark done')+'</button>';
   }else{
-   actions='<button class="tiny-btn" data-habit-dec="'+escapeHTML(s.itemId)+'" '+(habitValue(recordItem)<=0?'disabled':'')+'>−</button><span class="note">'+habitValue(recordItem)+' / '+habitGoal(recordItem)+'</span><button class="tiny-btn" data-habit-inc="'+escapeHTML(s.itemId)+'">+</button>';
+   actions='<button class="tiny-btn" data-habit-dec="'+escapeHTML(s.itemId)+'" '+(habitValue(recordItem)<=0||!currentDay?'disabled':'')+'>−</button><span class="note">'+habitValue(recordItem)+' / '+habitGoal(recordItem)+'</span><button class="tiny-btn" data-habit-inc="'+escapeHTML(s.itemId)+'" '+(currentDay?'':'disabled')+'>+</button>';
   }
  }
  const subtaskText=s.kind==='task'&&recordItem?.subTaskIds?.length?' · '+recordItem.subTaskIds.length+' subtasks':'';
@@ -515,6 +516,7 @@ function saveSession(event){
  notice(wantsRepeat?'Session saved · Habit repeats on scheduled days.':'Session saved.');
 }
 function openHabitLog(id){
+ if(state.day!==state.today)return notice('Open Today to log completed habit time.');
  const h=state.habits.find(h=>h.id===id);
  if(!h||h.type!=='StopWatch')return;
  if(h.isOn)return notice('Pause the habit stopwatch in Super Productivity before adding time.');
@@ -524,6 +526,7 @@ function openHabitLog(id){
 }
 async function saveHabitLog(event){
  event.preventDefault();
+ if(state.day!==state.today){$('log-error').textContent='Open Today to add recorded time.';return;}
  const id=state.logHabit,minutes=Number($('log-minutes').value);
  if(!Number.isFinite(minutes)||minutes<.5||minutes>1440||Math.round(minutes*2)!==minutes*2){
   $('log-error').textContent='Enter 0.5–1,440 minutes in 30-second steps.';return;
@@ -544,6 +547,7 @@ async function saveHabitLog(event){
  finally{state.busy.delete('habit:'+id);}
 }
 async function taskDone(id){
+ if(state.day!==state.today)return notice('Open Today to update task completion.');
  const t=state.tasks.find(x=>x.id===id);if(!t||state.busy.has('task:'+id))return;
  state.busy.add('task:'+id);
  try{if(state.api)await state.api.updateTask(id,{isDone:!t.isDone});t.isDone=!t.isDone;render();}
@@ -551,6 +555,7 @@ async function taskDone(id){
  finally{state.busy.delete('task:'+id);}
 }
 async function habitUpdate(id,delta){
+ if(state.day!==state.today)return notice('Open Today to update habit progress.');
  const h=state.habits.find(x=>x.id===id);if(!h||h.type==='StopWatch'||state.busy.has('habit:'+id))return;
  state.busy.add('habit:'+id);
  try{
