@@ -11,8 +11,11 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 - [ ] Reorder several tasks and habits together in one block with drag or the visible up/down arrow icons.
 - [ ] Each planned session is visually distinct, with enough contrast in light and dark modes.
 - [ ] Each card shows exactly five icon-only actions in one horizontal row: Done (or relevant habit action), Up, Down, Time / Move, More.
-- [ ] Each icon has an accessible label and a tooltip; the **More** icon opens a separate popup without expanding or shifting other cards.
-- [ ] Close the popup via Escape, close control, or outside click. On mobile, the popup stays inside the viewport.
+- [ ] Each icon has an accessible label and a tooltip; the **More** icon opens a centered popup without expanding or shifting other cards.
+- [ ] The two session buttons, **Add session** and **Remove**, sit side by side below the five icons in each card.
+- [ ] The popup focuses on colors (no duplicate Add/Remove controls).
+- [ ] Close the popup via Escape, close control, or outside click. On mobile, the centered popup stays inside the viewport.
+- [ ] Keep the popup open while native tasks, habits or synced plugin data refresh automatically. Close it only when the user dismisses it, changes days or the original session disappears.
 - [ ] The Night block uses a muted slate/gray header with readable text in both themes.
 - [ ] Dragging, saving, logging time, and moving sessions do not leave persistent success notices at the bottom. Failures still show useful feedback.
 - [ ] Select a preset background, then a custom hex color; both should apply to just that session.
