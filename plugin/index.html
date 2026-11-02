@@ -437,6 +437,34 @@ function addFlexible(key,block){
  const s={id:freshId(),kind:itemType(key),itemId:rawId(key),block,order:sessionsIn(block).length,start:null,end:null,minutes:null,color:null,repeatId:null};
  record().sessions.push(s);save();render();
 }
+function openMore(id,button){
+ const session=getSession(id);
+ if(!session)return;
+ state.moreId=id;
+ $('more-title').textContent=item(uniqueKey(session))?.title||'Session options';
+ $('more-content').innerHTML=sessionPopupContent(session);
+ const layer=$('more-backdrop'),popup=$('more-popup');
+ layer.classList.remove('hidden');
+ const anchor=button.getBoundingClientRect();
+ const size=popup.getBoundingClientRect();
+ const pad=12;
+ const left=Math.min(Math.max(pad,anchor.right-size.width),Math.max(pad,window.innerWidth-size.width-pad));
+ let top=anchor.bottom+8;
+ if(top+size.height>window.innerHeight-pad)top=anchor.top-size.height-8;
+ top=Math.min(Math.max(pad,top),Math.max(pad,window.innerHeight-size.height-pad));
+ popup.style.left=left+'px';popup.style.top=top+'px';
+ $('more-close').focus();
+}
+function closeMore(restoreFocus=true){
+ if($('more-backdrop').classList.contains('hidden'))return;
+ const id=state.moreId;
+ $('more-backdrop').classList.add('hidden');
+ state.moreId=null;
+ if(restoreFocus&&id){
+  const button=[...document.querySelectorAll('[data-more-session]')].find(el=>el.dataset.moreSession===id);
+  button?.focus();
+ }
+}
 function changeSessionColor(id,color){
  const existing=getSession(id);
  if(!existing)return;
@@ -449,14 +477,16 @@ function changeSessionColor(id,color){
  const card=[...document.querySelectorAll('[data-session]')].find(el=>el.dataset.session===id);
  if(card){
   card.style.setProperty('--session-tint',resolvedColor(session));
-  for(const choice of card.querySelectorAll('[data-session-color]')){
-   const value=choice.dataset.colorValue;
-   const selected=value==='auto'?!session.color:value===session.color;
-   choice.setAttribute('aria-pressed',String(selected));
-   choice.querySelector('.color-dot').textContent=selected?'✓':'';
+  if(state.moreId===id){
+   for(const choice of $('more-content').querySelectorAll('[data-session-color]')){
+    const value=choice.dataset.colorValue;
+    const selected=value==='auto'?!session.color:value===session.color;
+    choice.setAttribute('aria-pressed',String(selected));
+    choice.querySelector('.color-dot').textContent=selected?'✓':'';
+   }
+   const custom=$('more-content').querySelector('[data-custom-session-color]');
+   if(custom)custom.value=session.color?.startsWith('#')?session.color:resolvedColor(session);
   }
-  const custom=card.querySelector('[data-custom-session-color]');
-  if(custom)custom.value=session.color?.startsWith('#')?session.color:resolvedColor(session);
  }
 
 }
@@ -566,6 +596,7 @@ function blockCard(b){
   '<button type="button" class="block-add" data-new-block="'+b.id+'">+ Add to '+b.name+'</button></section>';
 }
 function render(){
+ closeMore(false);
  if(!state.day)state.day=state.today||localDay();
  const list=sourceItems(),sessions=visibleSessions(),completed=new Set(sessions.filter(s=>{const v=item(uniqueKey(s));return s.kind==='habit'?v&&habitDone(v):v&&v.isDone}).map(uniqueKey));
  $('day-label').textContent=humanDay(state.day);
@@ -583,10 +614,13 @@ function render(){
   (state.demo?'<span class="metric">Preview data · No app connection</span>':'')+
   '<span class="helper">One item may have multiple sessions, but completion counts once.</span>';
 }
+let noticeTimeout=null;
 function notice(message){
  const el=$('toast');el.textContent=message;el.classList.remove('hidden');
+ if(noticeTimeout)clearTimeout(noticeTimeout);
+ noticeTimeout=setTimeout(()=>{el.classList.add('hidden');noticeTimeout=null;},4800);
 }
-function clearNotice(){$('toast').classList.add('hidden');}
+function clearNotice(){if(noticeTimeout)clearTimeout(noticeTimeout);noticeTimeout=null;$('toast').classList.add('hidden');}
 function closeDialog(which){
  const backdrop=$(which+'-backdrop');backdrop.classList.add('hidden');
  if(which==='session')state.editor=null;
@@ -759,20 +793,23 @@ document.addEventListener('pointermove',e=>{
 });
 document.addEventListener('pointerup',dragEnd);document.addEventListener('pointercancel',dragEnd);
 document.addEventListener('click',e=>{
+ if(e.target===$('more-backdrop')){closeMore();return;}
  const btn=e.target.closest('button');if(!btn||btn.disabled)return;
+ if(btn.id==='more-close'){closeMore();return;}
  const d=btn.dataset;
- if(d.sessionColor)changeSessionColor(d.sessionColor,d.colorValue);
- else if(d.planKey)openSessionEditor({key:d.planKey});
+ if(d.moreSession){openMore(d.moreSession,btn);return;}
+ if(d.sessionColor){changeSessionColor(d.sessionColor,d.colorValue);return;}
+ if(d.copySession){const orig=getSession(d.copySession);closeMore(false);if(orig)openSessionEditor({key:uniqueKey(orig),block:orig.block});return;}
+ if(d.removeSession){closeMore(false);removeSession(d.removeSession);return;}
+ if(d.habitDec){closeMore(false);void habitUpdate(d.habitDec,-1);return;}
+ if(d.planKey)openSessionEditor({key:d.planKey});
  else if(d.newBlock)openSessionEditor({block:d.newBlock});
  else if(d.editSession)openSessionEditor({id:d.editSession});
- else if(d.copySession){const orig=getSession(d.copySession);if(orig)openSessionEditor({key:uniqueKey(orig),block:orig.block});}
- else if(d.removeSession)removeSession(d.removeSession);
  else if(d.upSession)reorderSession(d.upSession,-1);
  else if(d.downSession)reorderSession(d.downSession,1);
  else if(d.taskDone)void taskDone(d.taskDone);
  else if(d.habitToggle)void habitUpdate(d.habitToggle,'toggle');
  else if(d.habitInc)void habitUpdate(d.habitInc,1);
- else if(d.habitDec)void habitUpdate(d.habitDec,-1);
  else if(d.logHabit)openHabitLog(d.logHabit);
 });
 document.addEventListener('change',e=>{
@@ -794,7 +831,7 @@ $('prev-day').addEventListener('click',()=>{state.day=plusDays(state.day,-1);ren
 $('next-day').addEventListener('click',()=>{state.day=plusDays(state.day,1);render();});
 $('go-today').addEventListener('click',()=>{state.day=state.today;render();});
 $('refresh').addEventListener('click',()=>void refresh());
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('session-backdrop').classList.contains('hidden'))closeDialog('session');else if(!$('log-backdrop').classList.contains('hidden'))closeDialog('log');else clearNotice();});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('more-backdrop').classList.contains('hidden'))closeMore();else if(!$('session-backdrop').classList.contains('hidden'))closeDialog('session');else if(!$('log-backdrop').classList.contains('hidden'))closeDialog('log');else clearNotice();});
 function demo(){
  const day=state.day;
  state.tasks=[
