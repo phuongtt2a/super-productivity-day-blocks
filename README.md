@@ -54,17 +54,16 @@ The four time blocks **remain in one horizontal row**, just like a timeline. Swi
 
 ![Compact Day Blocks layout on a small phone](docs/screenshots/day-blocks-small-phone.webp)
 
-## Install the preview
+## Install Day Blocks
 
-**Status: v0.1.1-beta.3 preview — not a stable release yet.**
+**Current version: v0.1.1-beta.3 — GitHub pre-release (preview, not yet stable).**
 
-1. Open [GitHub Actions — Check Day Blocks plugin](https://github.com/phuongtt2a/super-productivity-day-blocks/actions/workflows/check.yml) and choose the latest successful run on **main**.
-2. Download the `day-blocks-preview` artifact and extract it.
-3. Inside, locate `dist/day-blocks-super-productivity.zip`.
-4. In Super Productivity, open **Settings → Plugins → Choose Plugin File** and install that ZIP **without unpacking the plugin ZIP itself**.
-5. Open **Day Blocks** from the plugins menu.
+1. Open the [Day Blocks v0.1.1-beta.3 GitHub pre-release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v0.1.1-beta.3).
+2. Under **Assets**, download **day-blocks-super-productivity.zip**. Do not download GitHub's automatic *Source code* ZIP.
+3. In Super Productivity, open **Settings → Plugins → Choose Plugin File** and install that ZIP directly, without unpacking it.
+4. Open **Day Blocks** from the plugins menu.
 
-This version is a preview on the main development branch. When the first stable version is approved, the release download will be available from [GitHub Releases](https://github.com/phuongtt2a/super-productivity-day-blocks/releases).
+The beta pre-release is available for easy installation and review. It is not yet marked as a stable release; the stable version will follow user acceptance.
 
 ## A few things to know
 
