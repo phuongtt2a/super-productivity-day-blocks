@@ -103,6 +103,16 @@ with sync_playwright() as p:
         assert page.locator('#unassigned [data-source-key="task:plan"]').count()==0
         print("same task planned twice, linked but counted once: PASS")
 
+        # The parent task's original subtasks are available from either
+        # linked session; changes update the same native subtask record.
+        page.locator('.morning .subtask-panel summary').first.click()
+        page.locator('.morning [data-task-done="outline"]').first.click()
+        page.wait_for_function("window.__tasks.find(t=>t.id==='outline').isDone===true")
+        page.locator('.afternoon .subtask-panel summary').first.click()
+        assert page.locator('.afternoon .subtask-row.is-done',has_text="Outline slides").count()==1
+        assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='outline').length")==1
+        print("subtask completion shared across linked task sessions: PASS")
+
         # Flexible item can be moved to the Night block; both earlier sessions remain.
         page.locator('[data-plan-key="task:call"]').click()
         page.locator('#session-block').select_option("night")
