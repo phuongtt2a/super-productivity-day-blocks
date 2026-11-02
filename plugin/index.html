@@ -417,7 +417,20 @@ function changeSessionColor(id,color){
  if(!session)return;
  session.color=color==='auto'?null:normalizeColor(color);
  // Personal color for this planned session only; another session stays unchanged.
- save();render();
+ save();
+ const card=[...document.querySelectorAll('[data-session]')].find(el=>el.dataset.session===id);
+ if(card){
+  card.style.setProperty('--session-tint',resolvedColor(session));
+  for(const choice of card.querySelectorAll('[data-session-color]')){
+   const value=choice.dataset.colorValue;
+   const selected=value==='auto'?!session.color:value===session.color;
+   choice.setAttribute('aria-pressed',String(selected));
+   choice.querySelector('.color-dot').textContent=selected?'✓':'';
+  }
+  const custom=card.querySelector('[data-custom-session-color]');
+  if(custom)custom.value=session.color?.startsWith('#')?session.color:resolvedColor(session);
+ }
+
 }
 function removeSession(id){
  const s=getSession(id);if(!s)return;
