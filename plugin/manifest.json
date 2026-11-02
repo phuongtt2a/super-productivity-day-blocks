@@ -1,0 +1,31 @@
+{
+  "id": "sp-day-blocks",
+  "name": "Day Blocks",
+  "version": "0.1.1-beta.3",
+  "description": "Arrange today's tasks and habits into four time blocks with flexible sessions.",
+  "manifestVersion": 1,
+  "minSupVersion": "14.0.0",
+  "author": "phuongtt2a",
+  "icon": "icon.svg",
+  "iFrame": true,
+  "sidePanel": false,
+  "permissions": [
+    "getTasks",
+    "getAllProjects",
+    "getAllSimpleCounters",
+    "getDayContext",
+    "updateTask",
+    "setCounter",
+    "loadSyncedData",
+    "persistDataSynced"
+  ],
+  "hooks": [
+    "taskCreated",
+    "taskUpdate",
+    "taskComplete",
+    "taskDelete",
+    "dataChanged",
+    "dayChange",
+    "persistedDataChanged"
+  ]
+}
