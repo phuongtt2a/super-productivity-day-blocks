@@ -1,5 +1,12 @@
 # Release notes
 
+## 0.1.1-beta.6 — Apply color and close
+
+- Selecting **Apply color** now saves the custom session color and closes the popup immediately.
+- The color stays saved when reopened. Invalid hex codes keep **Apply color** unavailable instead of closing.
+- Preset colors can still be previewed without automatically dismissing the popup.
+- Preserve the fixed four-block timeline when editing tasks and the inline custom-color controls.
+
 ## 0.1.1-beta.5 — Keep the daily timeline intact while editing tasks
 
 - Keep Unassigned beside the timeline when Super Productivity opens its task details and narrows the available space.
