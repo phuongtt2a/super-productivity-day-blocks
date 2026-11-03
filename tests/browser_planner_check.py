@@ -49,6 +49,9 @@ window.PluginAPI={
  setCounter:async(id,value)=>{
   window.__habits.find(h=>h.id===id).countOnDay[window.__today]=value;
   window.__events.push({name:'habit',id,value});
+ },
+ selectTask:async(id)=>{
+  window.__events.push({name:'open-task',id});
  }
 };
 """
@@ -75,6 +78,17 @@ with sync_playwright() as p:
         )==["morning","afternoon","evening","night"]
         assert page.locator('#unassigned [data-source-key="habit:reading"]').count()==1
         print("one-row four-column timeline and goal-met habit in unassigned: PASS")
+
+        # The title of an Unassigned task selects its real Super Productivity
+        # record. Habit text stays non-clickable because selectTask is for tasks.
+        assert page.locator('#unassigned [data-source-key="task:call"] [data-open-task="call"]').count()==1
+        assert page.locator('#unassigned [data-source-key="habit:jog"] [data-open-task]').count()==0
+        before=page.locator('#unassigned [data-source-key="task:call"]').count()
+        page.locator('#unassigned [data-source-key="task:call"] [data-open-task="call"]').click()
+        page.wait_for_function("window.__events.some(e=>e.name==='open-task'&&e.id==='call')")
+        assert page.locator('#unassigned [data-source-key="task:call"]').count()==before
+        assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='call').length")==0
+        print("unassigned task opens original details without changing its plan: PASS")
 
         # Schedule a task with exact times in Morning.
         page.locator('[data-plan-key="task:plan"]').click()
@@ -153,15 +167,35 @@ with sync_playwright() as p:
         assert page.locator('#unassigned [data-source-key="task:plan"]').count()==0
         print("same task planned twice, linked but counted once: PASS")
 
+        # Clicking the title in either planned session opens exactly the same
+        # original task. It does not create an extra session or complete it.
+        assert page.locator('.morning [data-open-task="plan"]').count()==1
+        assert page.locator('.afternoon [data-open-task="plan"]').count()==1
+        session_count=page.locator('[data-session]').count()
+        page.locator('.morning [data-open-task="plan"]').click()
+        page.wait_for_function("window.__events.some(e=>e.name==='open-task'&&e.id==='plan')")
+        page.locator('.afternoon [data-open-task="plan"]').focus()
+        page.keyboard.press("Enter")
+        page.wait_for_function("window.__events.filter(e=>e.name==='open-task'&&e.id==='plan').length===2")
+        assert page.locator('[data-session]').count()==session_count
+        assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='plan').length")==0
+        assert page.locator('.morning [data-open-task="plan"]').get_attribute('aria-label')=="Open task details: Prepare quarterly plan"
+        print("task title click and keyboard navigation across linked sessions: PASS")
+
         # The parent task's original subtasks are available from either
         # linked session; changes update the same native subtask record.
         page.locator('.morning .subtask-panel summary').first.click()
+        page.locator('.morning [data-open-task="outline"]').click()
+        page.wait_for_function("window.__events.some(e=>e.name==='open-task'&&e.id==='outline')")
+        assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='outline').length")==0
         page.locator('.morning [data-task-done="outline"]').first.click()
         page.wait_for_function("window.__tasks.find(t=>t.id==='outline').isDone===true")
         page.locator('.afternoon .subtask-panel summary').first.click()
         assert page.locator('.afternoon .subtask-row.is-done',has_text="Outline slides").count()==1
         assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='outline').length")==1
         print("subtask completion shared across linked task sessions: PASS")
+        assert page.locator('.afternoon [data-open-task="outline"]').count()==1
+        assert page.locator('.afternoon [data-open-task="outline"]').get_attribute('title')=="Open task details"
 
         # Flexible item can be moved to the Night block; both earlier sessions remain.
         page.locator('[data-plan-key="task:call"]').click()
