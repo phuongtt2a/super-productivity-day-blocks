@@ -36,6 +36,7 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 ## Make space for what matters
 
 - **Four blocks, one day.** Follow Morning (5 AM–noon), Afternoon (noon–6 PM), Evening (6–10 PM), and the slate-gray Night (10 PM–midnight) from left to right.
+- **Open task details.** Click or tap a task title in Unassigned or on the timeline to edit the original task in Super Productivity. Subtask titles open their own details too.
 - **Tasks and habits together.** Find today's items in **Unassigned**. Move them into a block with a drag or the **Plan** button. Expand a planned task to see and complete its subtasks.
 - **Clear, one-line controls.** Five compact icons for Done (or habit progress), Move up, Move down, Time / Move, and More. Beneath them, two balanced buttons let you **Add session** or **Remove** a planned session quickly. **More** opens a centered popup just for personalizing its color.
 - **Make colors yours.** Each session has a soft background by default. Pick a preset or set any custom color; the choice is saved for that individual session.
@@ -56,9 +57,9 @@ The four time blocks **remain in one horizontal row**, just like a timeline. Swi
 
 ## Install Day Blocks
 
-**Current version: v0.1.1-beta.3 — GitHub pre-release (preview, not yet stable).**
+**Current version: v0.1.1-beta.4 — GitHub pre-release (preview, not yet stable).**
 
-1. Open the [Day Blocks v0.1.1-beta.3 GitHub pre-release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v0.1.1-beta.3).
+1. Open the [Day Blocks v0.1.1-beta.4 GitHub pre-release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v0.1.1-beta.4).
 2. Under **Assets**, download **day-blocks-super-productivity.zip**. Do not download GitHub's automatic *Source code* ZIP.
 3. In Super Productivity, open **Settings → Plugins → Choose Plugin File** and install that ZIP directly, without unpacking it.
 4. Open **Day Blocks** from the plugins menu.
