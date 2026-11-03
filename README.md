@@ -20,7 +20,7 @@ Click a task title to open its details in Super Productivity. If the details pan
 
 ![Session card with five icons, Add session and Remove buttons](docs/screenshots/session-actions.webp)
 
-### A color popup you can always close
+### Choose a color, apply, and continue
 
 ![Centered background-color popup over the Day Blocks timeline](docs/screenshots/day-blocks-centered-popup.webp)
 
@@ -63,14 +63,14 @@ The four time blocks **remain in one horizontal row**, just like a timeline. Swi
 
 ## Install Day Blocks
 
-**Latest development preview: v0.1.1-beta.6 — not yet merged or published as a GitHub Release.**
+**Latest stable version: v1.0.0 — the first official release.**
 
-1. Open the successful [preview build for the task-details layout fix](https://github.com/phuongtt2a/super-productivity-day-blocks/actions/workflows/check.yml).
-2. Download the `day-blocks-preview` artifact, extract the outer artifact ZIP, and locate `dist/day-blocks-super-productivity.zip`.
-3. In Super Productivity, open **Settings → Plugins → Choose Plugin File** and install the *inner* plugin ZIP directly.
-4. Open **Day Blocks**, try clicking a task title, and set a custom session color. **Apply color** should immediately close the popup.
+1. Open the [Day Blocks v1.0.0 release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v1.0.0).
+2. Under **Assets**, download **day-blocks-super-productivity.zip**. Avoid GitHub's automatic *Source code* ZIP.
+3. In Super Productivity, open **Settings → Plugins → Choose Plugin File** and install the downloaded plugin ZIP directly **without extracting it**.
+4. Open **Day Blocks** from the plugin menu. Your saved daily plans and colors will continue to work when updating from the preview.
 
-The previously published [v0.1.1-beta.3 pre-release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v0.1.1-beta.3) remains available. This newer build will not replace it until tested and approved.
+Day Blocks v1.0.0 is the user-accepted stable baseline. Future features can be tested independently before merging into `main`.
 
 ## A few things to know
 
@@ -81,6 +81,8 @@ A task appearing in Morning and Afternoon is **one task with two planned session
 Routine planning actions quietly update the board. If something fails, Day Blocks briefly shows an explanation rather than leaving a permanent notification at the bottom. The color popup stays open during automatic task updates until you close it.
 
 You can keep using Today+ v2.0.0 exactly as before. Day Blocks doesn't modify its layout, preferences, or plugin release.
+
+**Release status:** Day Blocks v1.0.0 is our first stable version, accepted after testing in the installed Super Productivity application.
 
 ---
 
