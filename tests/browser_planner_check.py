@@ -185,7 +185,7 @@ with sync_playwright() as p:
         assert page.locator('#more-content [data-color-saturation]').count()==1
         assert page.locator('#more-content [data-color-lightness]').count()==1
 
-        # Use the custom in-popup picker; no OS/browser color popup should open.
+        # Inline custom color controls do not launch an OS/browser color picker.
         page.locator('#more-content [data-color-hue]').fill("265")
         page.locator('#more-content [data-color-saturation]').fill("64")
         page.locator('#more-content [data-color-lightness]').fill("68")
@@ -194,26 +194,26 @@ with sync_playwright() as p:
         assert page.locator('#more-content [data-apply-custom-color]').is_enabled()
         page.locator('#more-content [data-apply-custom-color]').click()
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")==slider_color
-        assert page.locator('#more-backdrop:not(.hidden)').count()==1
+        assert page.locator('#more-backdrop.hidden').count()==1
+        assert page.locator('.morning [data-more-session]').is_focused()
+        print("Apply color saves and automatically closes the popup: PASS")
 
-        # A valid manually entered hex also works and remains independently saved.
+        # The hex field also saves and closes. Invalid values must not dismiss
+        # the popup or change the saved color.
+        page.locator('.morning [data-more-session]').click()
+        page.locator('#more-content [data-custom-session-color]').fill("invalid")
+        assert page.locator('#more-content [data-apply-custom-color]').is_disabled()
+        assert page.locator('#more-backdrop:not(.hidden)').count()==1
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")==slider_color
         page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
         page.locator('#more-content [data-apply-custom-color]').click()
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
-        page.locator('#more-content [data-custom-session-color]').fill("invalid")
-        assert page.locator('#more-content [data-apply-custom-color]').is_disabled()
-        page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
-        assert page.locator('#more-backdrop:not(.hidden)').count()==1
-
-        # After choosing a custom color, the user can close/reopen the normal
-        # Day Blocks popup immediately, with the selected hex still intact.
-        page.locator('#more-close').click()
         assert page.locator('#more-backdrop.hidden').count()==1
         page.locator('.morning [data-more-session]').click()
         assert page.locator('#more-content [data-custom-session-color]').input_value()=="#bcacf0"
         page.keyboard.press("Escape")
         assert page.locator('#more-backdrop.hidden').count()==1
-        print("inline custom color sliders/hex, persistence and reliable popup close: PASS")
+        print("invalid hex stays open; valid custom hex closes and persists: PASS")
 
         # Additional linked Afternoon session shares the same native ID.
         page.locator('.morning [data-copy-session]').click()
