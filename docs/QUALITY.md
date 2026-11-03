@@ -19,7 +19,9 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 - [ ] Keep the popup open while native tasks, habits or synced plugin data refresh automatically. Close it only when the user dismisses it, changes days or the original session disappears.
 - [ ] The Night block uses a muted slate/gray header with readable text in both themes.
 - [ ] Dragging, saving, logging time, and moving sessions do not leave persistent success notices at the bottom. Failures still show useful feedback.
-- [ ] Select a preset background, then a custom hex color; both should apply to just that session.
+- [ ] Select a preset background, then a custom hex color or use Hue/Saturation/Lightness sliders. Choose Apply color and verify only that session changes.
+- [ ] The custom controls stay inside the popup (no extra native/system color window). After applying a color, Close, Escape, and outside click should all dismiss the popup.
+- [ ] Reopen the popup and verify the chosen color remains selected, including on a narrow mobile screen.
 - [ ] Move a colored session between blocks, reorder it, and reopen the app. The chosen color stays with that session.
 - [ ] Reset a session to automatic color. Changing the color of one linked session must not recolor its other appearances.
 - [ ] Verify the Unassigned list remains next to the timeline on desktop, so drag-and-drop stays convenient.
