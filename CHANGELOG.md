@@ -4,6 +4,7 @@
 
 - Keep Unassigned beside the timeline when Super Productivity opens its task details and narrows the available space.
 - Preserve Morning → Afternoon → Evening → Night in one horizontal row; scroll sideways rather than collapsing the columns or enlarging each card.
+- Replace the native custom-color chooser with simple in-popup color sliders and a hex field. Custom colors can be applied and the popup closed normally, avoiding a stuck system picker.
 - Keep the compact phone layout and all existing scheduling and task-detail actions unchanged.
 
 ## 0.1.1-beta.4 — Open original task details
