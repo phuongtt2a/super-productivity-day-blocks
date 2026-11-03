@@ -51,6 +51,10 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .source-item{display:flex;align-items:center;gap:7px;min-width:0;background:var(--surface-strong);border:1px solid var(--line);border-radius:6px;padding:9px 8px}
 .source-body{min-width:0;flex:1}
 .source-title{font-weight:750;font-size:12.5px;line-height:1.3;overflow-wrap:anywhere}
+.task-open{display:inline;max-width:100%;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;line-height:inherit;text-align:left;overflow-wrap:anywhere;cursor:pointer}
+.task-open:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.task-open:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.subtask-row .task-open{min-width:0;min-height:0;border:0;padding:0;background:transparent;font:inherit;color:inherit;text-align:left}
 .source-note{margin-top:4px;font-size:10.5px;color:var(--muted);line-height:1.4}
 .kind{font-size:9.5px;font-weight:800;letter-spacing:.025em;border:1px solid var(--line);border-radius:4px;padding:3px 5px;white-space:nowrap;background:var(--surface)}
 .kind.habit{background:color-mix(in srgb,#a8dcb8 28%,var(--surface-strong))}
@@ -503,13 +507,17 @@ function reorderSession(id,delta){
  list.forEach((sid,i)=>{const row=ensureSessionMutable(sid);if(row)row.order=i;});
  save();render();
 }
+function taskTitleLink(id,title){
+ // Use Super Productivity's own task details, never create an independent editor.
+ return '<button type="button" class="task-open" data-open-task="'+escapeHTML(id)+'" title="Open task details" aria-label="Open task details: '+escapeHTML(title)+'">'+escapeHTML(title)+'</button>';
+}
 function sourceCard(i){
  const children=i.children.length?' · '+i.children.length+' subtask'+(i.children.length===1?'':'s'):'';
  const extra=i.kind==='habit'?(i.value.type==='StopWatch'?' · '+niceMinutes(Math.round(habitGoal(i.value)/60000))+' goal':habitDone(i.value)?' · Goal reached':''):'';
  const desc=i.kind==='task'?(dueDay(i.value)||'Subtasks of today')+children:(!i.value.isTrackStreaks?'Habit':'Scheduled habit')+extra;
  return '<article class="source-item" data-source-key="'+escapeHTML(i.key)+'">'+
   '<button type="button" class="drag-handle" data-drag-source="'+escapeHTML(i.key)+'" title="Drag into a block" aria-label="Drag '+escapeHTML(i.value.title)+' to a block">⠿</button>'+
-  '<div class="source-body"><div class="source-title">'+escapeHTML(i.value.title)+'</div><div class="source-note">'+escapeHTML(desc)+'</div></div>'+
+  '<div class="source-body"><div class="source-title">'+(i.kind==='task'?taskTitleLink(i.value.id,i.value.title):escapeHTML(i.value.title))+'</div><div class="source-note">'+escapeHTML(desc)+'</div></div>'+
   '<span class="kind '+i.kind+'">'+(i.kind==='task'?'Task':'Habit')+'</span>'+
   '<button type="button" class="source-plan" data-plan-key="'+escapeHTML(i.key)+'" aria-label="Plan '+escapeHTML(i.value.title)+'">Plan</button></article>';
 }
@@ -564,12 +572,12 @@ function sessionCard(s){
  const children=s.kind==='task'&&recordItem?([...new Set(recordItem.subTaskIds||[])].map(id=>state.tasks.find(t=>t.id===id)).filter(Boolean)):[];
  const subtaskText=children.length?' · '+children.length+' subtasks':'';
  const subtaskHtml=children.length?'<details class="subtask-panel"><summary>Subtasks · '+children.filter(t=>t.isDone).length+'/'+children.length+' done</summary><div class="subtask-items">'+
-   children.map(t=>'<div class="subtask-row '+(t.isDone?'is-done':'')+'"><button type="button" data-task-done="'+escapeHTML(t.id)+'" '+(currentDay?'':'disabled')+' aria-label="'+(t.isDone?'Undo':'Complete')+' subtask '+escapeHTML(t.title)+'">'+(t.isDone?'✓':'○')+'</button><span>'+escapeHTML(t.title)+'</span></div>').join('')+
+   children.map(t=>'<div class="subtask-row '+(t.isDone?'is-done':'')+'"><button type="button" data-task-done="'+escapeHTML(t.id)+'" '+(currentDay?'':'disabled')+' aria-label="'+(t.isDone?'Undo':'Complete')+' subtask '+escapeHTML(t.title)+'">'+(t.isDone?'✓':'○')+'</button><span>'+taskTitleLink(t.id,t.title)+'</span></div>').join('')+
    '</div></details>':'';
  const status=done?' · Done':'';
  return '<article class="session '+(count>1?'multi ':'')+(done?'is-done':'')+'" style="--session-tint:'+resolvedColor(s)+'" data-session="'+escapeHTML(s.id)+'" data-sort-block="'+s.block+'">'+
   '<div class="session-head"><button class="drag-handle" type="button" data-drag-session="'+escapeHTML(s.id)+'" aria-label="Drag session for '+escapeHTML(title)+'" title="Drag to move or reorder">⠿</button>'+
-  '<span class="session-title">'+escapeHTML(title)+'</span><span class="kind '+s.kind+'">'+(s.kind==='task'?'Task':'Habit')+'</span></div>'+
+  '<span class="session-title">'+(s.kind==='task'&&!missing?taskTitleLink(s.itemId,title):escapeHTML(title))+'</span><span class="kind '+s.kind+'">'+(s.kind==='task'?'Task':'Habit')+'</span></div>'+
   '<div class="session-meta">'+(missing?'This item was removed in Super Productivity':dateText+subtaskText+status)+(progress?' · '+escapeHTML(progress):'')+(s.repeatId?' · ↻ Repeats':'')+'</div>'+
   linked+subtaskHtml+
   '<div class="session-toolbar" role="group" aria-label="Session actions for '+escapeHTML(title)+'">'+action+
@@ -620,6 +628,12 @@ function notice(message){
  noticeTimeout=setTimeout(()=>{el.classList.add('hidden');noticeTimeout=null;},4800);
 }
 function clearNotice(){if(noticeTimeout)clearTimeout(noticeTimeout);noticeTimeout=null;$('toast').classList.add('hidden');}
+async function openTaskDetails(id){
+ if(!state.tasks.some(task=>task.id===id))return notice('This task is no longer available.');
+ if(!state.api||typeof state.api.selectTask!=='function')return notice('Open Super Productivity to edit task details.');
+ try{await state.api.selectTask(id);}
+ catch(err){notice('Could not open task details: '+String(err?.message||err));}
+}
 function closeDialog(which){
  const backdrop=$(which+'-backdrop');backdrop.classList.add('hidden');
  if(which==='session')state.editor=null;
@@ -798,6 +812,7 @@ document.addEventListener('click',e=>{
  const d=btn.dataset;
  if(d.moreSession){openMore(d.moreSession,btn);return;}
  if(d.sessionColor){changeSessionColor(d.sessionColor,d.colorValue);return;}
+ if(d.openTask){void openTaskDetails(d.openTask);return;}
  if(d.copySession){const orig=getSession(d.copySession);closeMore(false);if(orig)openSessionEditor({key:uniqueKey(orig),block:orig.block});return;}
  if(d.removeSession){closeMore(false);removeSession(d.removeSession);return;}
  if(d.habitDec){closeMore(false);void habitUpdate(d.habitDec,-1);return;}
