@@ -875,7 +875,10 @@ document.addEventListener('click',e=>{
  if(d.sessionColor){changeSessionColor(d.sessionColor,d.colorValue);return;}
  if(d.applyCustomColor){
   const input=$('more-content').querySelector('[data-custom-session-color]');
-  if(input&&updateCustomPreview(input.value))changeSessionColor(d.applyCustomColor,input.value);
+  if(input&&updateCustomPreview(input.value)){
+   changeSessionColor(d.applyCustomColor,input.value);
+   closeMore();
+  }
   return;
  }
  if(d.openTask){void openTaskDetails(d.openTask);return;}
