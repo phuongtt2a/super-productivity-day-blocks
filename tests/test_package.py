@@ -33,7 +33,9 @@ class TestDayBlocksPackage(unittest.TestCase):
         self.assertNotIn("sp-today-tasks-habits", js + html)
         self.assertIn("day-blocks.plans.v1", html)
         self.assertIn("repeat(4,minmax(", html)
-        self.assertIn("grid-auto-flow:column", html)
+        self.assertIn("grid-template-columns:repeat(4,minmax(", html)
+        self.assertIn(".timeline-scroll{overflow-x:auto", html)
+        self.assertIn(".planner{grid-template-columns:minmax(210px,245px) minmax(0,1fr)", html)
 
     def test_javascript_syntax(self):
         html = (PLUGIN / "index.html").read_text(encoding="utf-8")
