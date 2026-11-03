@@ -40,6 +40,11 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 
 ## Completion and safety
 
+- [ ] Clicking a task title in Unassigned opens its original details in Super Productivity.
+- [ ] Clicking a task title in a planned Morning or Afternoon session opens the same original task; the plan and completion remain unchanged.
+- [ ] Clicking a subtask title opens that subtask's details, whereas its checkbox still toggles completion.
+- [ ] Task titles are keyboard accessible and no navigation is triggered by dragging/reordering, marking Done, or pressing other card buttons.
+- [ ] Habit titles remain unchanged (they are not tasks).
 - [ ] Completing a task in one block updates its other sessions.
 - [ ] A repeated habit counts as completed once, even when planned several times.
 - [ ] Expand a task with subtasks and complete one. Its status updates in every linked session.
