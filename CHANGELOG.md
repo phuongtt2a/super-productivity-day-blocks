@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.1.1-beta.4 — Open original task details
+
+- Click or tap task titles directly from Unassigned or any planned session to open the task's original details in Super Productivity.
+- Click subtask titles to open the subtask's own details; complete checkboxes and drag handles remain independent.
+- Keep habits, planned time, existing session colors, four-column order and clean popup behavior unchanged.
+
 ## 0.1.1-beta.3 — Centered color popup and faster session actions
 
 - Open the session More menu as a centered popup, rather than beside a card.
