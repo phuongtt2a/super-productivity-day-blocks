@@ -10,6 +10,12 @@ Day Blocks is a Super Productivity companion that helps you decide **when** to w
 
 ![Day Blocks dashboard with four time blocks in a single horizontal timeline](docs/screenshots/day-blocks-desktop.webp)
 
+### Keep your timeline while editing a task
+
+Click a task title to open its details in Super Productivity. If the details panel makes Day Blocks narrower, **Unassigned stays beside the timeline** and all four blocks remain in chronological order. Scroll the blocks sideways when needed.
+
+![Day Blocks timeline at a narrower width when task details are open](docs/screenshots/day-blocks-task-details-narrow.webp)
+
 ### Simpler session controls
 
 ![Session card with five icons, Add session and Remove buttons](docs/screenshots/session-actions.webp)
@@ -57,14 +63,14 @@ The four time blocks **remain in one horizontal row**, just like a timeline. Swi
 
 ## Install Day Blocks
 
-**Current version: v0.1.1-beta.4 — GitHub pre-release (preview, not yet stable).**
+**Latest development preview: v0.1.1-beta.5 — not yet merged or published as a GitHub Release.**
 
-1. Open the [Day Blocks v0.1.1-beta.4 GitHub pre-release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v0.1.1-beta.4).
-2. Under **Assets**, download **day-blocks-super-productivity.zip**. Do not download GitHub's automatic *Source code* ZIP.
-3. In Super Productivity, open **Settings → Plugins → Choose Plugin File** and install that ZIP directly, without unpacking it.
-4. Open **Day Blocks** from the plugins menu.
+1. Open the successful [preview build for the task-details layout fix](https://github.com/phuongtt2a/super-productivity-day-blocks/actions/workflows/check.yml).
+2. Download the `day-blocks-preview` artifact, extract the outer artifact ZIP, and locate `dist/day-blocks-super-productivity.zip`.
+3. In Super Productivity, open **Settings → Plugins → Choose Plugin File** and install the *inner* plugin ZIP directly.
+4. Open **Day Blocks** and try clicking a task title, then closing its details panel.
 
-The beta pre-release is available for easy installation and review. It is not yet marked as a stable release; the stable version will follow user acceptance.
+The previously published [v0.1.1-beta.3 pre-release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v0.1.1-beta.3) remains available. This newer build will not replace it until tested and approved.
 
 ## A few things to know
 
