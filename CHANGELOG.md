@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.1.1-beta.5 — Keep the daily timeline intact while editing tasks
+
+- Keep Unassigned beside the timeline when Super Productivity opens its task details and narrows the available space.
+- Preserve Morning → Afternoon → Evening → Night in one horizontal row; scroll sideways rather than collapsing the columns or enlarging each card.
+- Keep the compact phone layout and all existing scheduling and task-detail actions unchanged.
+
 ## 0.1.1-beta.4 — Open original task details
 
 - Click or tap task titles directly from Unassigned or any planned session to open the task's original details in Super Productivity.
