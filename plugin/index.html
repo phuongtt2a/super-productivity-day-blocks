@@ -51,6 +51,10 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .source-item{display:flex;align-items:center;gap:7px;min-width:0;background:var(--surface-strong);border:1px solid var(--line);border-radius:6px;padding:9px 8px}
 .source-body{min-width:0;flex:1}
 .source-title{font-weight:750;font-size:12.5px;line-height:1.3;overflow-wrap:anywhere}
+.task-open{display:inline;max-width:100%;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;line-height:inherit;text-align:left;overflow-wrap:anywhere;cursor:pointer}
+.task-open:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.task-open:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.subtask-row .task-open{min-width:0;min-height:0;border:0;padding:0;background:transparent;font:inherit;color:inherit;text-align:left}
 .source-note{margin-top:4px;font-size:10.5px;color:var(--muted);line-height:1.4}
 .kind{font-size:9.5px;font-weight:800;letter-spacing:.025em;border:1px solid var(--line);border-radius:4px;padding:3px 5px;white-space:nowrap;background:var(--surface)}
 .kind.habit{background:color-mix(in srgb,#a8dcb8 28%,var(--surface-strong))}
@@ -115,8 +119,19 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .color-swatch .color-dot{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--swatch);border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);font-size:11px;color:#21382e}
 .color-swatch.auto .color-dot{background:conic-gradient(#e8bd71 0 25%,#9ccfae 25% 50%,#a7bde6 50% 75%,#d5b3e0 75% 100%)}
 .color-swatch[aria-pressed=true]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px}
-.custom-color{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:750}
-.custom-color input{width:42px;height:36px;min-height:36px;padding:2px;border:1px solid var(--line);background:var(--surface);border-radius:5px;cursor:pointer}
+.custom-color{display:grid;gap:9px;padding-top:10px;border-top:1px dashed var(--line);font-size:11px;font-weight:750}
+.custom-color-row{display:flex;gap:9px;align-items:center}
+.custom-color-preview{width:34px;height:34px;flex:none;border:2px solid var(--line);border-radius:6px;background:var(--custom-preview,#b6c9aa)}
+.custom-color-hex{flex:1;min-width:0;min-height:36px;border:1px solid var(--line);border-radius:5px;background:var(--surface-strong);padding:7px 9px;font-family:inherit;font-size:12px}
+.custom-color-label{font-size:10px;font-weight:750;color:var(--muted)}
+.custom-sliders{display:grid;gap:8px}
+.custom-sliders label{display:grid;grid-template-columns:68px minmax(0,1fr);gap:8px;align-items:center}
+.custom-sliders input[type=range]{width:100%;height:19px;accent-color:var(--accent);cursor:pointer}
+.custom-sliders input[data-color-hue]{accent-color:transparent;appearance:none;background:linear-gradient(to right,#f55,#ff5,#5f5,#5ff,#55f,#f5f,#f55);height:12px;border-radius:7px;border:1px solid var(--line)}
+.custom-sliders input[data-color-hue]::-webkit-slider-thumb{appearance:none;width:17px;height:20px;border-radius:5px;background:var(--surface-strong);border:2px solid var(--stroke)}
+.custom-sliders input[data-color-hue]::-moz-range-thumb{width:16px;height:19px;border-radius:5px;background:var(--surface-strong);border:2px solid var(--stroke)}
+.custom-color-apply{min-height:37px;border:1px solid var(--stroke);border-radius:5px;background:color-mix(in srgb,var(--accent) 18%,var(--surface-strong));font-size:12px;font-weight:800;cursor:pointer}
+.custom-color-error{min-height:12px;font-size:11px;color:#b44436}
 
 .tiny-btn{background:var(--surface-strong)}
 .session-more{position:relative;min-width:0}
@@ -131,14 +146,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .session-menu-actions>.span-two{grid-column:1/-1}
 .session-menu-actions .remove-session{border-color:color-mix(in srgb,#cf654c 52%,var(--line))}
 .menu-heading{font-size:10px;font-weight:850;letter-spacing:.045em;text-transform:uppercase;color:var(--muted)}
-.session-colors{display:flex;gap:5px;flex-wrap:wrap}
-.color-swatch{display:grid;place-items:center;width:34px;height:34px;min-height:34px;border-radius:5px;background:var(--surface);border:1px solid var(--line);padding:4px}
-.color-swatch .color-dot{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--swatch);border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);font-size:11px;color:#21382e}
-.color-swatch.auto .color-dot{background:conic-gradient(#e8bd71 0 25%,#9ccfae 25% 50%,#a7bde6 50% 75%,#d5b3e0 75% 100%)}
-.color-swatch[aria-pressed=true]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px}
-.custom-color{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:750}
-.custom-color input{width:42px;height:36px;min-height:36px;padding:2px;border:1px solid var(--line);background:var(--surface);border-radius:5px;cursor:pointer}
- .session .action-row{margin-top:8px;gap:6px}
+.session .action-row{margin-top:8px;gap:6px}
 .session .action-row .tiny-btn{font-size:11px;font-weight:850;background:var(--surface-strong);min-height:35px}
 
 .tiny-btn{font-size:10px;min-height:32px;border-width:1px;box-shadow:none;padding:4px 6px}
@@ -166,20 +174,24 @@ button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-v
 .dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:15px}
 .error{font-size:12px;color:#bd4235;min-height:14px;margin-top:6px}
 .toast{position:fixed;bottom:16px;right:16px;max-width:min(360px,90vw);background:var(--card-bg,#fff);color:var(--ink);border:2px solid var(--stroke);border-radius:6px;box-shadow:3px 3px 0 var(--stroke);font-size:12px;line-height:1.5;padding:12px 14px;z-index:1200}
+/* Keep the sidebar and four chronological columns side by side when the
+   Super Productivity task detail panel reduces the embedded view width.
+   The timeline scrolls horizontally; cards never collapse or wrap. */
 @media(max-width:1100px){
- .planner{grid-template-columns:minmax(0,1fr)}
+ .planner{grid-template-columns:minmax(210px,245px) minmax(0,1fr);gap:12px}
  .backlog{padding:12px}
- .source-list{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
- .timeline{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(245px,72vw);min-width:max-content}
  .block{min-height:420px}
  .helper{margin-left:0}
 }
 @media(max-width:540px){
+ /* Actual phone-sized layouts may stack the Unassigned list for readability.
+    The four day blocks themselves still remain in a single horizontal row. */
  .shell{padding:12px}
  .hero{gap:12px}.brand-icon{width:44px;height:44px}
  .day-nav{width:100%;justify-content:center}.day-label{min-width:130px}
+ .planner{grid-template-columns:minmax(0,1fr)}
  .source-list{grid-template-columns:minmax(0,1fr)}
- .timeline{grid-auto-columns:minmax(248px,82vw);gap:10px}
+ .timeline{grid-template-columns:repeat(4,minmax(248px,1fr));min-width:1022px;gap:10px}
  .block{min-height:355px}.metrics{gap:6px}
  .metric{font-size:11px;padding:6px 8px}
  .field-grid{grid-template-columns:1fr}
@@ -311,7 +323,56 @@ function colorChoices(s){
  const palette=SESSION_PALETTE.map(c=>'<button class="color-swatch" type="button" data-session-color="'+escapeHTML(s.id)+'" data-color-value="'+c.id+'" aria-label="'+c.label+' background" aria-pressed="'+String(c.id===value)+'" title="'+c.label+'"><span class="color-dot" aria-hidden="true" style="--swatch:'+c.hex+'">'+(c.id===value?'✓':'')+'</span></button>').join('');
  const custom=value&&value[0]==='#'?value:resolvedColor(s);
  return '<div class="menu-heading">Background color</div><div class="session-colors" role="group" aria-label="Choose session background color">'+auto+palette+'</div>'+
- '<label class="custom-color">Custom color <input type="color" data-custom-session-color="'+escapeHTML(s.id)+'" value="'+custom+'" aria-label="Choose a custom background color"></label>';
+ '<div class="custom-color"><div class="menu-heading">Custom color</div><div class="custom-color-row">'+
+ '<span class="custom-color-preview" style="--custom-preview:'+custom+'" id="custom-color-preview" aria-hidden="true"></span>'+
+ '<input type="text" class="custom-color-hex" data-custom-session-color="'+escapeHTML(s.id)+'" value="'+custom+'" maxlength="7" spellcheck="false" aria-label="Custom hex color" placeholder="#aabbcc"></div>'+
+ '<div class="custom-sliders">'+
+ '<label><span class="custom-color-label">Hue</span><input type="range" data-color-hue min="0" max="359" value="150" aria-label="Custom hue"></label>'+
+ '<label><span class="custom-color-label">Saturation</span><input type="range" data-color-saturation min="0" max="100" value="35" aria-label="Custom saturation"></label>'+
+ '<label><span class="custom-color-label">Lightness</span><input type="range" data-color-lightness min="15" max="90" value="70" aria-label="Custom lightness"></label>'+
+ '</div><button type="button" class="custom-color-apply" data-apply-custom-color="'+escapeHTML(s.id)+'">Apply color</button>'+
+ '<div class="custom-color-error" id="custom-color-error" role="status"></div></div>';
+}
+function hslToHex(h,s,l){
+ s/=100;l/=100;
+ const a=s*Math.min(l,1-l);
+ const channel=n=>{
+  const k=(n+h/30)%12;
+  return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1)))).toString(16).padStart(2,'0');
+ };
+ return '#'+channel(0)+channel(8)+channel(4);
+}
+function hexToHsl(hex){
+ const v=normalizeColor(hex);
+ if(!v||!v.startsWith('#'))return [150,35,70];
+ const rgb=[1,3,5].map(i=>parseInt(v.slice(i,i+2),16)/255);
+ const [r,g,b]=rgb,min=Math.min(...rgb),max=Math.max(...rgb);
+ const d=max-min;let h=0,s=0,l=(max+min)/2;
+ if(d){
+  s=d/(1-Math.abs(2*l-1));
+  switch(max){case r:h=((g-b)/d)%6;break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4;}
+  h=(h*60+360)%360;
+ }
+ return [Math.round(h),Math.round(s*100),Math.round(l*100)];
+}
+function updateCustomPreview(hex){
+ const input=$('more-content').querySelector('[data-custom-session-color]');
+ const preview=$('custom-color-preview');
+ const error=$('custom-color-error');
+ const color=normalizeColor(hex);
+ const valid=!!color&&color.startsWith('#');
+ if(preview&&valid)preview.style.setProperty('--custom-preview',color);
+ if(error)error.textContent=valid?'':'Use a six-digit hex color such as #aabbcc.';
+ const apply=$('more-content').querySelector('[data-apply-custom-color]');
+ if(apply)apply.disabled=!valid;
+ return valid;
+}
+function syncCustomSliders(hex){
+ const [h,s,l]=hexToHsl(hex);
+ for(const [key,value] of [['data-color-hue',h],['data-color-saturation',s],['data-color-lightness',l]]){
+  const control=$('more-content').querySelector('['+key+']');
+  if(control)control.value=String(value);
+ }
 }
 const STORAGE='day-blocks.plans.v1';
 const state={api:null,tasks:[],habits:[],projects:new Map(),day:'',today:'',data:{version:1,days:{},routines:[]},revision:0,writeQueue:Promise.resolve(),saving:false,showOverdue:false,showFinished:false,drag:null,editor:null,logHabit:null,moreId:null,demo:false,pendingSync:false,busy:new Set()};
@@ -452,6 +513,7 @@ function openMore(id,button){
  const layer=$('more-backdrop'),popup=$('more-popup');
  layer.classList.remove('hidden');
  // The popup is centered by its overlay, never tied to the card position.
+ syncCustomSliders(resolvedColor(session));
  $('more-close').focus();
 }
 function closeMore(restoreFocus=true){
@@ -484,7 +546,10 @@ function changeSessionColor(id,color){
     choice.querySelector('.color-dot').textContent=selected?'✓':'';
    }
    const custom=$('more-content').querySelector('[data-custom-session-color]');
-   if(custom)custom.value=session.color?.startsWith('#')?session.color:resolvedColor(session);
+   const hex=session.color?.startsWith('#')?session.color:resolvedColor(session);
+   if(custom)custom.value=hex;
+   updateCustomPreview(hex);
+   syncCustomSliders(hex);
   }
  }
 
@@ -503,13 +568,17 @@ function reorderSession(id,delta){
  list.forEach((sid,i)=>{const row=ensureSessionMutable(sid);if(row)row.order=i;});
  save();render();
 }
+function taskTitleLink(id,title){
+ // Use Super Productivity's own task details, never create an independent editor.
+ return '<button type="button" class="task-open" data-open-task="'+escapeHTML(id)+'" title="Open task details" aria-label="Open task details: '+escapeHTML(title)+'">'+escapeHTML(title)+'</button>';
+}
 function sourceCard(i){
  const children=i.children.length?' · '+i.children.length+' subtask'+(i.children.length===1?'':'s'):'';
  const extra=i.kind==='habit'?(i.value.type==='StopWatch'?' · '+niceMinutes(Math.round(habitGoal(i.value)/60000))+' goal':habitDone(i.value)?' · Goal reached':''):'';
  const desc=i.kind==='task'?(dueDay(i.value)||'Subtasks of today')+children:(!i.value.isTrackStreaks?'Habit':'Scheduled habit')+extra;
  return '<article class="source-item" data-source-key="'+escapeHTML(i.key)+'">'+
   '<button type="button" class="drag-handle" data-drag-source="'+escapeHTML(i.key)+'" title="Drag into a block" aria-label="Drag '+escapeHTML(i.value.title)+' to a block">⠿</button>'+
-  '<div class="source-body"><div class="source-title">'+escapeHTML(i.value.title)+'</div><div class="source-note">'+escapeHTML(desc)+'</div></div>'+
+  '<div class="source-body"><div class="source-title">'+(i.kind==='task'?taskTitleLink(i.value.id,i.value.title):escapeHTML(i.value.title))+'</div><div class="source-note">'+escapeHTML(desc)+'</div></div>'+
   '<span class="kind '+i.kind+'">'+(i.kind==='task'?'Task':'Habit')+'</span>'+
   '<button type="button" class="source-plan" data-plan-key="'+escapeHTML(i.key)+'" aria-label="Plan '+escapeHTML(i.value.title)+'">Plan</button></article>';
 }
@@ -564,12 +633,12 @@ function sessionCard(s){
  const children=s.kind==='task'&&recordItem?([...new Set(recordItem.subTaskIds||[])].map(id=>state.tasks.find(t=>t.id===id)).filter(Boolean)):[];
  const subtaskText=children.length?' · '+children.length+' subtasks':'';
  const subtaskHtml=children.length?'<details class="subtask-panel"><summary>Subtasks · '+children.filter(t=>t.isDone).length+'/'+children.length+' done</summary><div class="subtask-items">'+
-   children.map(t=>'<div class="subtask-row '+(t.isDone?'is-done':'')+'"><button type="button" data-task-done="'+escapeHTML(t.id)+'" '+(currentDay?'':'disabled')+' aria-label="'+(t.isDone?'Undo':'Complete')+' subtask '+escapeHTML(t.title)+'">'+(t.isDone?'✓':'○')+'</button><span>'+escapeHTML(t.title)+'</span></div>').join('')+
+   children.map(t=>'<div class="subtask-row '+(t.isDone?'is-done':'')+'"><button type="button" data-task-done="'+escapeHTML(t.id)+'" '+(currentDay?'':'disabled')+' aria-label="'+(t.isDone?'Undo':'Complete')+' subtask '+escapeHTML(t.title)+'">'+(t.isDone?'✓':'○')+'</button><span>'+taskTitleLink(t.id,t.title)+'</span></div>').join('')+
    '</div></details>':'';
  const status=done?' · Done':'';
  return '<article class="session '+(count>1?'multi ':'')+(done?'is-done':'')+'" style="--session-tint:'+resolvedColor(s)+'" data-session="'+escapeHTML(s.id)+'" data-sort-block="'+s.block+'">'+
   '<div class="session-head"><button class="drag-handle" type="button" data-drag-session="'+escapeHTML(s.id)+'" aria-label="Drag session for '+escapeHTML(title)+'" title="Drag to move or reorder">⠿</button>'+
-  '<span class="session-title">'+escapeHTML(title)+'</span><span class="kind '+s.kind+'">'+(s.kind==='task'?'Task':'Habit')+'</span></div>'+
+  '<span class="session-title">'+(s.kind==='task'&&!missing?taskTitleLink(s.itemId,title):escapeHTML(title))+'</span><span class="kind '+s.kind+'">'+(s.kind==='task'?'Task':'Habit')+'</span></div>'+
   '<div class="session-meta">'+(missing?'This item was removed in Super Productivity':dateText+subtaskText+status)+(progress?' · '+escapeHTML(progress):'')+(s.repeatId?' · ↻ Repeats':'')+'</div>'+
   linked+subtaskHtml+
   '<div class="session-toolbar" role="group" aria-label="Session actions for '+escapeHTML(title)+'">'+action+
@@ -620,6 +689,12 @@ function notice(message){
  noticeTimeout=setTimeout(()=>{el.classList.add('hidden');noticeTimeout=null;},4800);
 }
 function clearNotice(){if(noticeTimeout)clearTimeout(noticeTimeout);noticeTimeout=null;$('toast').classList.add('hidden');}
+async function openTaskDetails(id){
+ if(!state.tasks.some(task=>task.id===id))return notice('This task is no longer available.');
+ if(!state.api||typeof state.api.selectTask!=='function')return notice('Open Super Productivity to edit task details.');
+ try{await state.api.selectTask(id);}
+ catch(err){notice('Could not open task details: '+String(err?.message||err));}
+}
 function closeDialog(which){
  const backdrop=$(which+'-backdrop');backdrop.classList.add('hidden');
  if(which==='session')state.editor=null;
@@ -798,6 +873,15 @@ document.addEventListener('click',e=>{
  const d=btn.dataset;
  if(d.moreSession){openMore(d.moreSession,btn);return;}
  if(d.sessionColor){changeSessionColor(d.sessionColor,d.colorValue);return;}
+ if(d.applyCustomColor){
+  const input=$('more-content').querySelector('[data-custom-session-color]');
+  if(input&&updateCustomPreview(input.value)){
+   changeSessionColor(d.applyCustomColor,input.value);
+   closeMore();
+  }
+  return;
+ }
+ if(d.openTask){void openTaskDetails(d.openTask);return;}
  if(d.copySession){const orig=getSession(d.copySession);closeMore(false);if(orig)openSessionEditor({key:uniqueKey(orig),block:orig.block});return;}
  if(d.removeSession){closeMore(false);removeSession(d.removeSession);return;}
  if(d.habitDec){closeMore(false);void habitUpdate(d.habitDec,-1);return;}
@@ -811,9 +895,22 @@ document.addEventListener('click',e=>{
  else if(d.habitInc)void habitUpdate(d.habitInc,1);
  else if(d.logHabit)openHabitLog(d.logHabit);
 });
-document.addEventListener('change',e=>{
- const picker=e.target.closest('input[data-custom-session-color]');
- if(picker)changeSessionColor(picker.dataset.customSessionColor,picker.value);
+document.addEventListener('input',e=>{
+ const target=e.target;
+ if(target.matches('[data-custom-session-color]')){
+  updateCustomPreview(target.value);
+  if(normalizeColor(target.value)?.startsWith('#'))syncCustomSliders(target.value);
+  return;
+ }
+ if(target.matches('[data-color-hue],[data-color-saturation],[data-color-lightness]')){
+  const h=Number($('more-content').querySelector('[data-color-hue]').value);
+  const saturation=Number($('more-content').querySelector('[data-color-saturation]').value);
+  const lightness=Number($('more-content').querySelector('[data-color-lightness]').value);
+  const hex=hslToHex(h,saturation,lightness);
+  const input=$('more-content').querySelector('[data-custom-session-color]');
+  if(input)input.value=hex;
+  updateCustomPreview(hex);
+ }
 });
 $('session-form').addEventListener('submit',saveSession);
 $('session-cancel').addEventListener('click',()=>closeDialog('session'));

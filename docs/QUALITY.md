@@ -1,6 +1,8 @@
-# Day Blocks — Preview review
+# Day Blocks — Quality review
 
-This page is for testing the Day Blocks preview. The plugin is not yet a stable release.
+**Stable baseline: v1.0.0.** The user confirmed that the latest beta behavior works in the installed Super Productivity application. This checklist records our ongoing quality standards for future changes; it is not a list of unfinished release blockers.
+
+Screenshots and the full user guide are available in the [README](../README.md).
 
 ## Planning a day
 
@@ -19,7 +21,11 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 - [ ] Keep the popup open while native tasks, habits or synced plugin data refresh automatically. Close it only when the user dismisses it, changes days or the original session disappears.
 - [ ] The Night block uses a muted slate/gray header with readable text in both themes.
 - [ ] Dragging, saving, logging time, and moving sessions do not leave persistent success notices at the bottom. Failures still show useful feedback.
-- [ ] Select a preset background, then a custom hex color; both should apply to just that session.
+- [ ] Select a preset background, then a custom hex color or use Hue/Saturation/Lightness sliders. **Apply color** must save the color and close the popup immediately.
+- [ ] Reopen More after applying a color; verify the saved hex value, and confirm focus returns to the original More control.
+- [ ] Enter an invalid hex: Apply color should be disabled while the popup remains open. Valid colors should update only the selected session.
+- [ ] The custom controls stay inside the popup (no extra native/system color window). After applying a color, Close, Escape, and outside click should all dismiss the popup.
+- [ ] Reopen the popup and verify the chosen color remains selected, including on a narrow mobile screen.
 - [ ] Move a colored session between blocks, reorder it, and reopen the app. The chosen color stays with that session.
 - [ ] Reset a session to automatic color. Changing the color of one linked session must not recolor its other appearances.
 - [ ] Verify the Unassigned list remains next to the timeline on desktop, so drag-and-drop stays convenient.
@@ -40,6 +46,11 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 
 ## Completion and safety
 
+- [ ] Clicking a task title in Unassigned opens its original details in Super Productivity.
+- [ ] Clicking a task title in a planned Morning or Afternoon session opens the same original task; the plan and completion remain unchanged.
+- [ ] Clicking a subtask title opens that subtask's details, whereas its checkbox still toggles completion.
+- [ ] Task titles are keyboard accessible and no navigation is triggered by dragging/reordering, marking Done, or pressing other card buttons.
+- [ ] Habit titles remain unchanged (they are not tasks).
 - [ ] Completing a task in one block updates its other sessions.
 - [ ] A repeated habit counts as completed once, even when planned several times.
 - [ ] Expand a task with subtasks and complete one. Its status updates in every linked session.
@@ -48,6 +59,11 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 - [ ] Both Today+ and Day Blocks can be installed together without changing each other's settings.
 
 ## Appearance and navigation
+
+- [ ] On a wide desktop, open any task detail. The timeline still has four separate blocks in one horizontal row.
+- [ ] Keep task details open while narrowing the plugin view to about 1100, 900, 720 and 560 pixels: Unassigned stays to the left, the day blocks never stack or become squeezed, and the timeline scrolls sideways.
+- [ ] Close task details and widen the view again: the full four-column timeline is restored without losing its planned sessions.
+- [ ] Check the screenshot documenting the narrower task-details layout.
 
 - [ ] Check desktop, tablet, and 320px / 390px mobile widths.
 - [ ] Check touch, mouse, keyboard, and long Vietnamese titles.

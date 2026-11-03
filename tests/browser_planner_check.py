@@ -49,6 +49,9 @@ window.PluginAPI={
  setCounter:async(id,value)=>{
   window.__habits.find(h=>h.id===id).countOnDay[window.__today]=value;
   window.__events.push({name:'habit',id,value});
+ },
+ selectTask:async(id)=>{
+  window.__events.push({name:'open-task',id});
  }
 };
 """
@@ -75,6 +78,53 @@ with sync_playwright() as p:
         )==["morning","afternoon","evening","night"]
         assert page.locator('#unassigned [data-source-key="habit:reading"]').count()==1
         print("one-row four-column timeline and goal-met habit in unassigned: PASS")
+
+        # The title of an Unassigned task selects its real Super Productivity
+        # record. Habit text stays non-clickable because selectTask is for tasks.
+        assert page.locator('#unassigned [data-source-key="task:call"] [data-open-task="call"]').count()==1
+        assert page.locator('#unassigned [data-source-key="habit:jog"] [data-open-task]').count()==0
+        before=page.locator('#unassigned [data-source-key="task:call"]').count()
+        page.locator('#unassigned [data-source-key="task:call"] [data-open-task="call"]').click()
+        page.wait_for_function("window.__events.some(e=>e.name==='open-task'&&e.id==='call')")
+        assert page.locator('#unassigned [data-source-key="task:call"]').count()==before
+        assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='call').length")==0
+        print("unassigned task opens original details without changing its plan: PASS")
+
+        # Opening the host's task-detail panel reduces the embedded plugin width.
+        # The Unassigned sidebar must stay alongside the timeline on desktop,
+        # and the four blocks must remain a single row with comfortable widths.
+        # Simulate the host resizing its plugin iframe after task selection.
+        for width in (1280, 1100, 1024, 900, 720, 600, 560):
+            page.set_viewport_size({"width":width,"height":1024})
+            measurements=page.evaluate("""() => {
+              const rect=el=>el.getBoundingClientRect();
+              const blocks=[...document.querySelectorAll('#timeline > .block')];
+              const timeline=document.querySelector('#timeline-scroll');
+              const sidebar=document.querySelector('#backlog');
+              return {
+                sidebarRight:rect(sidebar).right,
+                boardLeft:rect(document.querySelector('.board')).left,
+                tops:blocks.map(el=>rect(el).top),
+                widths:blocks.map(el=>rect(el).width),
+                names:blocks.map(el=>el.dataset.dropBlock),
+                contentWidth:document.documentElement.scrollWidth,
+                viewport:window.innerWidth,
+                scrollable:timeline.scrollWidth>timeline.clientWidth+2,
+                timelineColumns:getComputedStyle(document.querySelector('#timeline')).gridTemplateColumns.split(' ').length
+              };
+            }""")
+            assert measurements['boardLeft']>=measurements['sidebarRight']-1, (width,measurements)
+            assert measurements['names']==['morning','afternoon','evening','night']
+            assert max(measurements['tops'])-min(measurements['tops'])<2, (width,measurements)
+            assert min(measurements['widths'])>=220, (width,measurements)
+            assert measurements['timelineColumns']==4, (width,measurements)
+            assert measurements['contentWidth']<=width+2, (width,measurements)
+            if width<=1100:
+                assert measurements['scrollable'], (width,measurements)
+        page.set_viewport_size({"width":1680,"height":1024})
+        assert page.locator('#unassigned [data-source-key="task:call"]').count()==1
+        print("native detail panel width changes preserve left sidebar and all four timeline columns: PASS")
+
 
         # Schedule a task with exact times in Morning.
         page.locator('[data-plan-key="task:plan"]').click()
@@ -130,11 +180,40 @@ with sync_playwright() as p:
         # Choose a custom color for one session without changing another card.
         page.locator('#more-content [data-session-color][data-color-value="lilac"]').click()
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#c8b2e9"
-        page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
-        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
+        assert page.locator('#more-content input[type="color"]').count()==0
+        assert page.locator('#more-content [data-color-hue]').count()==1
+        assert page.locator('#more-content [data-color-saturation]').count()==1
+        assert page.locator('#more-content [data-color-lightness]').count()==1
+
+        # Inline custom color controls do not launch an OS/browser color picker.
+        page.locator('#more-content [data-color-hue]').fill("265")
+        page.locator('#more-content [data-color-saturation]').fill("64")
+        page.locator('#more-content [data-color-lightness]').fill("68")
+        slider_color=page.locator('#more-content [data-custom-session-color]').input_value()
+        assert slider_color.startswith("#") and len(slider_color)==7
+        assert page.locator('#more-content [data-apply-custom-color]').is_enabled()
+        page.locator('#more-content [data-apply-custom-color]').click()
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")==slider_color
+        assert page.locator('#more-backdrop.hidden').count()==1
+        assert page.locator('.morning [data-more-session]').evaluate("(el)=>document.activeElement===el")
+        print("Apply color saves and automatically closes the popup: PASS")
+
+        # The hex field also saves and closes. Invalid values must not dismiss
+        # the popup or change the saved color.
+        page.locator('.morning [data-more-session]').click()
+        page.locator('#more-content [data-custom-session-color]').fill("invalid")
+        assert page.locator('#more-content [data-apply-custom-color]').is_disabled()
         assert page.locator('#more-backdrop:not(.hidden)').count()==1
-        print("palette, arbitrary hex selection and menu persistence: PASS")
-        page.locator('#more-close').click()
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")==slider_color
+        page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
+        page.locator('#more-content [data-apply-custom-color]').click()
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
+        assert page.locator('#more-backdrop.hidden').count()==1
+        page.locator('.morning [data-more-session]').click()
+        assert page.locator('#more-content [data-custom-session-color]').input_value()=="#bcacf0"
+        page.keyboard.press("Escape")
+        assert page.locator('#more-backdrop.hidden').count()==1
+        print("invalid hex stays open; valid custom hex closes and persists: PASS")
 
         # Additional linked Afternoon session shares the same native ID.
         page.locator('.morning [data-copy-session]').click()
@@ -153,15 +232,35 @@ with sync_playwright() as p:
         assert page.locator('#unassigned [data-source-key="task:plan"]').count()==0
         print("same task planned twice, linked but counted once: PASS")
 
+        # Clicking the title in either planned session opens exactly the same
+        # original task. It does not create an extra session or complete it.
+        assert page.locator('.morning [data-open-task="plan"]').count()==1
+        assert page.locator('.afternoon [data-open-task="plan"]').count()==1
+        session_count=page.locator('[data-session]').count()
+        page.locator('.morning [data-open-task="plan"]').click()
+        page.wait_for_function("window.__events.some(e=>e.name==='open-task'&&e.id==='plan')")
+        page.locator('.afternoon [data-open-task="plan"]').focus()
+        page.keyboard.press("Enter")
+        page.wait_for_function("window.__events.filter(e=>e.name==='open-task'&&e.id==='plan').length===2")
+        assert page.locator('[data-session]').count()==session_count
+        assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='plan').length")==0
+        assert page.locator('.morning [data-open-task="plan"]').get_attribute('aria-label')=="Open task details: Prepare quarterly plan"
+        print("task title click and keyboard navigation across linked sessions: PASS")
+
         # The parent task's original subtasks are available from either
         # linked session; changes update the same native subtask record.
         page.locator('.morning .subtask-panel summary').first.click()
+        page.locator('.morning [data-open-task="outline"]').click()
+        page.wait_for_function("window.__events.some(e=>e.name==='open-task'&&e.id==='outline')")
+        assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='outline').length")==0
         page.locator('.morning [data-task-done="outline"]').first.click()
         page.wait_for_function("window.__tasks.find(t=>t.id==='outline').isDone===true")
         page.locator('.afternoon .subtask-panel summary').first.click()
         assert page.locator('.afternoon .subtask-row.is-done',has_text="Outline slides").count()==1
         assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='outline').length")==1
         print("subtask completion shared across linked task sessions: PASS")
+        assert page.locator('.afternoon [data-open-task="outline"]').count()==1
+        assert page.locator('.afternoon [data-open-task="outline"]').get_attribute('title')=="Open task details"
 
         # Flexible item can be moved to the Night block; both earlier sessions remain.
         page.locator('[data-plan-key="task:call"]').click()
@@ -253,7 +352,7 @@ with sync_playwright() as p:
         assert restored.locator('#timeline .block').count()==4
         assert restored.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
         assert restored.evaluate("document.querySelector('#timeline-scroll').scrollWidth>document.querySelector('#timeline-scroll').clientWidth")
-        assert restored.evaluate("getComputedStyle(document.querySelector('#timeline')).gridAutoFlow")=="column"
+        assert restored.locator('#timeline').evaluate("(el)=>getComputedStyle(el).gridTemplateColumns.split(' ').length")==4
         # Unassigned remains a left sidebar on desktop, a practical drag origin.
         assert page.evaluate("document.querySelector('#backlog').getBoundingClientRect().left < document.querySelector('#timeline').getBoundingClientRect().left")
         assert restored.locator('.session-toolbar').count()>=1

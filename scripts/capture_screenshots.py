@@ -25,6 +25,17 @@ with sync_playwright() as p:
         assert page.locator('.block').count()==4
         assert page.locator('.linked').count()>=2
         save_image(page,"day-blocks-desktop.webp")
+        # Opening a native task detail panel reduces available plugin width.
+        # Capture the full layout at that width: sidebar stays to the left,
+        # with the four blocks on the same scrollable horizontal timeline.
+        page.set_viewport_size({"width":920,"height":900})
+        sidebar=page.locator('#backlog').bounding_box()
+        board=page.locator('.board').bounding_box()
+        assert sidebar['x']+sidebar['width']<=board['x']+1
+        assert page.locator('#timeline').evaluate("(el)=>getComputedStyle(el).gridTemplateColumns.split(' ').length") == 4
+        assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
+        save_image(page,"day-blocks-task-details-narrow.webp")
+        page.set_viewport_size({"width":1660,"height":1010})
         # Capture the two tidy rows of controls on an individual session card.
         session_image=page.locator('.morning .session').first.screenshot(type="png",animations="disabled")
         Image.open(BytesIO(session_image)).convert("RGB").save(

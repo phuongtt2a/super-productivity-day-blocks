@@ -13,9 +13,9 @@ class TestDayBlocksPackage(unittest.TestCase):
         m = json.loads((PLUGIN / "manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(m["id"], "sp-day-blocks")
         self.assertEqual(m["name"], "Day Blocks")
-        self.assertEqual(m["version"], "0.1.1-beta.3")
+        self.assertEqual(m["version"], "1.0.0")
         self.assertTrue(m["iFrame"])
-        for permission in ("getTasks", "getAllSimpleCounters", "loadSyncedData", "persistDataSynced", "updateTask", "setCounter"):
+        for permission in ("getTasks", "getAllSimpleCounters", "loadSyncedData", "persistDataSynced", "updateTask", "setCounter", "selectTask"):
             self.assertIn(permission, m["permissions"])
 
     def test_bundle_has_exact_root_files(self):
@@ -23,7 +23,7 @@ class TestDayBlocksPackage(unittest.TestCase):
         with zipfile.ZipFile(ROOT / "dist/day-blocks-super-productivity.zip") as z:
             self.assertEqual(z.namelist(), ["manifest.json", "plugin.js", "index.html", "icon.svg"])
             self.assertIsNone(z.testzip())
-            self.assertEqual(json.loads(z.read("manifest.json"))["version"], "0.1.1-beta.3")
+            self.assertEqual(json.loads(z.read("manifest.json"))["version"], "1.0.0")
 
     def test_standalone_identity(self):
         js = (PLUGIN / "plugin.js").read_text(encoding="utf-8")
@@ -33,7 +33,9 @@ class TestDayBlocksPackage(unittest.TestCase):
         self.assertNotIn("sp-today-tasks-habits", js + html)
         self.assertIn("day-blocks.plans.v1", html)
         self.assertIn("repeat(4,minmax(", html)
-        self.assertIn("grid-auto-flow:column", html)
+        self.assertIn("grid-template-columns:repeat(4,minmax(", html)
+        self.assertIn(".timeline-scroll{overflow-x:auto", html)
+        self.assertIn(".planner{grid-template-columns:minmax(210px,245px) minmax(0,1fr)", html)
 
     def test_javascript_syntax(self):
         html = (PLUGIN / "index.html").read_text(encoding="utf-8")
