@@ -20,7 +20,7 @@ Click a task title to open its details in Super Productivity. If the details pan
 
 ![Session card with five icons, Add session and Remove buttons](docs/screenshots/session-actions.webp)
 
-### A color popup that stays in place
+### A color popup you can always close
 
 ![Centered background-color popup over the Day Blocks timeline](docs/screenshots/day-blocks-centered-popup.webp)
 
@@ -45,7 +45,7 @@ Click a task title to open its details in Super Productivity. If the details pan
 - **Open task details.** Click or tap a task title in Unassigned or on the timeline to edit the original task in Super Productivity. Subtask titles open their own details too.
 - **Tasks and habits together.** Find today's items in **Unassigned**. Move them into a block with a drag or the **Plan** button. Expand a planned task to see and complete its subtasks.
 - **Clear, one-line controls.** Five compact icons for Done (or habit progress), Move up, Move down, Time / Move, and More. Beneath them, two balanced buttons let you **Add session** or **Remove** a planned session quickly. **More** opens a centered popup just for personalizing its color.
-- **Make colors yours.** Each session has a soft background by default. Pick a preset or set any custom color; the choice is saved for that individual session.
+- **Make colors yours.** Each session has a soft background by default. Pick a preset, or create a custom color inside the popup using simple color sliders or a hex code. No separate system color picker is required. The color belongs to that individual session.
 - **Choose your order.** Drag planned sessions to another position, or use the visible up/down arrows on each card.
 - **Plan the time you need.** Leave a session flexible, give it a planned duration, or choose an exact start and end time within its block.
 - **Continue in another block.** Use **+ Add session** when one task or habit needs more than one part of the day. The linked cards still represent the same original item.
