@@ -195,7 +195,7 @@ with sync_playwright() as p:
         page.locator('#more-content [data-apply-custom-color]').click()
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")==slider_color
         assert page.locator('#more-backdrop.hidden').count()==1
-        assert page.locator('.morning [data-more-session]').is_focused()
+        assert page.locator('.morning [data-more-session]').evaluate("(el)=>document.activeElement===el")
         print("Apply color saves and automatically closes the popup: PASS")
 
         # The hex field also saves and closes. Invalid values must not dismiss
