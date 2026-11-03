@@ -180,11 +180,40 @@ with sync_playwright() as p:
         # Choose a custom color for one session without changing another card.
         page.locator('#more-content [data-session-color][data-color-value="lilac"]').click()
         assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#c8b2e9"
-        page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
-        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
+        assert page.locator('#more-content input[type="color"]').count()==0
+        assert page.locator('#more-content [data-color-hue]').count()==1
+        assert page.locator('#more-content [data-color-saturation]').count()==1
+        assert page.locator('#more-content [data-color-lightness]').count()==1
+
+        # Use the custom in-popup picker; no OS/browser color popup should open.
+        page.locator('#more-content [data-color-hue]').fill("265")
+        page.locator('#more-content [data-color-saturation]').fill("64")
+        page.locator('#more-content [data-color-lightness]').fill("68")
+        slider_color=page.locator('#more-content [data-custom-session-color]').input_value()
+        assert slider_color.startswith("#") and len(slider_color)==7
+        assert page.locator('#more-content [data-apply-custom-color]').is_enabled()
+        page.locator('#more-content [data-apply-custom-color]').click()
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")==slider_color
         assert page.locator('#more-backdrop:not(.hidden)').count()==1
-        print("palette, arbitrary hex selection and menu persistence: PASS")
+
+        # A valid manually entered hex also works and remains independently saved.
+        page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
+        page.locator('#more-content [data-apply-custom-color]').click()
+        assert page.locator('.morning .session').first.evaluate("(el)=>el.style.getPropertyValue('--session-tint')")=="#bcacf0"
+        page.locator('#more-content [data-custom-session-color]').fill("invalid")
+        assert page.locator('#more-content [data-apply-custom-color]').is_disabled()
+        page.locator('#more-content [data-custom-session-color]').fill("#bcacf0")
+        assert page.locator('#more-backdrop:not(.hidden)').count()==1
+
+        # After choosing a custom color, the user can close/reopen the normal
+        # Day Blocks popup immediately, with the selected hex still intact.
         page.locator('#more-close').click()
+        assert page.locator('#more-backdrop.hidden').count()==1
+        page.locator('.morning [data-more-session]').click()
+        assert page.locator('#more-content [data-custom-session-color]').input_value()=="#bcacf0"
+        page.keyboard.press("Escape")
+        assert page.locator('#more-backdrop.hidden').count()==1
+        print("inline custom color sliders/hex, persistence and reliable popup close: PASS")
 
         # Additional linked Afternoon session shares the same native ID.
         page.locator('.morning [data-copy-session]').click()
@@ -323,7 +352,7 @@ with sync_playwright() as p:
         assert restored.locator('#timeline .block').count()==4
         assert restored.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
         assert restored.evaluate("document.querySelector('#timeline-scroll').scrollWidth>document.querySelector('#timeline-scroll').clientWidth")
-        assert restored.evaluate("getComputedStyle(document.querySelector('#timeline')).gridAutoFlow")=="column"
+        assert restored.locator('#timeline').evaluate("(el)=>getComputedStyle(el).gridTemplateColumns.split(' ').length")==4
         # Unassigned remains a left sidebar on desktop, a practical drag origin.
         assert page.evaluate("document.querySelector('#backlog').getBoundingClientRect().left < document.querySelector('#timeline').getBoundingClientRect().left")
         assert restored.locator('.session-toolbar').count()>=1
