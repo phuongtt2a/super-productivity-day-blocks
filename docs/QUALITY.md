@@ -1,6 +1,8 @@
-# Day Blocks — Preview review
+# Day Blocks — Quality review
 
-This page is for testing the Day Blocks preview. The plugin is not yet a stable release.
+**Stable baseline: v1.0.0.** The user confirmed that the latest beta behavior works in the installed Super Productivity application. This checklist records our ongoing quality standards for future changes; it is not a list of unfinished release blockers.
+
+Screenshots and the full user guide are available in the [README](../README.md).
 
 ## Planning a day
 
