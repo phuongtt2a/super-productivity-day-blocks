@@ -13,7 +13,7 @@ class TestDayBlocksPackage(unittest.TestCase):
         m = json.loads((PLUGIN / "manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(m["id"], "sp-day-blocks")
         self.assertEqual(m["name"], "Day Blocks")
-        self.assertEqual(m["version"], "0.1.1-beta.5")
+        self.assertEqual(m["version"], "0.1.1-beta.6")
         self.assertTrue(m["iFrame"])
         for permission in ("getTasks", "getAllSimpleCounters", "loadSyncedData", "persistDataSynced", "updateTask", "setCounter", "selectTask"):
             self.assertIn(permission, m["permissions"])
@@ -23,7 +23,7 @@ class TestDayBlocksPackage(unittest.TestCase):
         with zipfile.ZipFile(ROOT / "dist/day-blocks-super-productivity.zip") as z:
             self.assertEqual(z.namelist(), ["manifest.json", "plugin.js", "index.html", "icon.svg"])
             self.assertIsNone(z.testzip())
-            self.assertEqual(json.loads(z.read("manifest.json"))["version"], "0.1.1-beta.5")
+            self.assertEqual(json.loads(z.read("manifest.json"))["version"], "0.1.1-beta.6")
 
     def test_standalone_identity(self):
         js = (PLUGIN / "plugin.js").read_text(encoding="utf-8")
