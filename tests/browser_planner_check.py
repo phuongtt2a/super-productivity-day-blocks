@@ -90,6 +90,42 @@ with sync_playwright() as p:
         assert page.evaluate("window.__events.filter(e=>e.name==='task'&&e.id==='call').length")==0
         print("unassigned task opens original details without changing its plan: PASS")
 
+        # Opening the host's task-detail panel reduces the embedded plugin width.
+        # The Unassigned sidebar must stay alongside the timeline on desktop,
+        # and the four blocks must remain a single row with comfortable widths.
+        # Simulate the host resizing its plugin iframe after task selection.
+        for width in (1280, 1100, 1024, 900, 720, 600, 560):
+            page.set_viewport_size({"width":width,"height":1024})
+            measurements=page.evaluate("""() => {
+              const rect=el=>el.getBoundingClientRect();
+              const blocks=[...document.querySelectorAll('#timeline > .block')];
+              const timeline=document.querySelector('#timeline-scroll');
+              const sidebar=document.querySelector('#backlog');
+              return {
+                sidebarRight:rect(sidebar).right,
+                boardLeft:rect(document.querySelector('.board')).left,
+                tops:blocks.map(el=>rect(el).top),
+                widths:blocks.map(el=>rect(el).width),
+                names:blocks.map(el=>el.dataset.dropBlock),
+                contentWidth:document.documentElement.scrollWidth,
+                viewport:window.innerWidth,
+                scrollable:timeline.scrollWidth>timeline.clientWidth+2,
+                timelineColumns:getComputedStyle(document.querySelector('#timeline')).gridTemplateColumns.split(' ').length
+              };
+            }""")
+            assert measurements['boardLeft']>=measurements['sidebarRight']-1, (width,measurements)
+            assert measurements['names']==['morning','afternoon','evening','night']
+            assert max(measurements['tops'])-min(measurements['tops'])<2, (width,measurements)
+            assert min(measurements['widths'])>=220, (width,measurements)
+            assert measurements['timelineColumns']==4, (width,measurements)
+            assert measurements['contentWidth']<=width+2, (width,measurements)
+            if width<=1100:
+                assert measurements['scrollable'], (width,measurements)
+        page.set_viewport_size({"width":1680,"height":1024})
+        assert page.locator('#unassigned [data-source-key="task:call"]').count()==1
+        print("native detail panel width changes preserve left sidebar and all four timeline columns: PASS")
+
+
         # Schedule a task with exact times in Morning.
         page.locator('[data-plan-key="task:plan"]').click()
         assert page.locator('#session-backdrop:not(.hidden)').count()==1
