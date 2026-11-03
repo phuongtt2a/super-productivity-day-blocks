@@ -54,6 +54,11 @@ This page is for testing the Day Blocks preview. The plugin is not yet a stable 
 
 ## Appearance and navigation
 
+- [ ] On a wide desktop, open any task detail. The timeline still has four separate blocks in one horizontal row.
+- [ ] Keep task details open while narrowing the plugin view to about 1100, 900, 720 and 560 pixels: Unassigned stays to the left, the day blocks never stack or become squeezed, and the timeline scrolls sideways.
+- [ ] Close task details and widen the view again: the full four-column timeline is restored without losing its planned sessions.
+- [ ] Check the screenshot documenting the narrower task-details layout.
+
 - [ ] Check desktop, tablet, and 320px / 390px mobile widths.
 - [ ] Check touch, mouse, keyboard, and long Vietnamese titles.
 - [ ] Check light/dark theme, the application's font, and wallpaper transparency.
