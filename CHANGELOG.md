@@ -1,5 +1,20 @@
 # Release notes
 
+## 1.0.0 — Your day, one block at a time
+
+**The first stable Day Blocks release**, accepted after real-app testing.
+
+- **See your whole day.** Plan tasks and habits across Morning, Afternoon, Evening, and Night in one left-to-right timeline, with Unassigned alongside it on desktop.
+- **Plan the way you work.** Drag items into blocks, arrange their order, set exact start/end times or flexible durations, and continue the same task or habit in more than one block without duplication.
+- **Build repeatable routines.** Assign habitual times to scheduled habit days while keeping your actual progress separate from planned time.
+- **Keep tasks within reach.** Click task and subtask titles to edit their original details in Super Productivity. The timeline stays intact when the app's details panel opens.
+- **Make every session clear.** Soft, independent session backgrounds; quick icon controls for progress and ordering; convenient Add session and Remove buttons; centered color popup.
+- **Apply colors and continue.** Preset palettes or custom sliders and hex colors. Applying a custom color saves it and immediately closes the popup.
+- **Work comfortably anywhere.** Theme and host font compatibility, wallpaper-friendly transparency, keyboard-accessible controls, and a continuous horizontal timeline on small screens.
+- **Keep your existing workflow.** Native task and habit progress are not copied. Day Blocks uses its own planning preferences and does not change Today+.
+
+**Getting started:** Download `day-blocks-super-productivity.zip` from the [official v1.0.0 release](https://github.com/phuongtt2a/super-productivity-day-blocks/releases/tag/v1.0.0) and install it through Super Productivity's plugin settings.
+
 ## 0.1.1-beta.6 — Apply color and close
 
 - Selecting **Apply color** now saves the custom session color and closes the popup immediately.
